@@ -1,0 +1,45 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Expo: start",
+      "type": "shell",
+      "command": "npx expo start",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "Lint",
+      "type": "shell",
+      "command": "npm run lint",
+      "group": { "kind": "test", "isDefault": false },
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "label": "Typecheck",
+      "type": "shell",
+      "command": "npm run typecheck",
+      "group": { "kind": "test", "isDefault": false },
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "Testes",
+      "type": "shell",
+      "command": "npm test",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Formatar (Prettier)",
+      "type": "shell",
+      "command": "npm run format",
+      "problemMatcher": []
+    },
+    {
+      "label": "Checagem completa (lint + typecheck + testes)",
+      "dependsOn": ["Lint", "Typecheck", "Testes"],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
+    }
+  ]
+}
