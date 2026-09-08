@@ -1,0 +1,73 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  quality-gate:
+    name: Checagem antes de liberar
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Testes
+        run: npm test
+
+  github-release:
+    name: Criar GitHub Release
+    runs-on: ubuntu-latest
+    needs: quality-gate
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Criar release a partir da tag
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          body: |
+            Veja o [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)
+            para o detalhamento completo desta versão.
+
+  # Job de build via EAS — desabilitado até o projeto ter um `eas.json` e um
+  # EXPO_TOKEN configurado em Settings > Secrets. Descomente quando estiver
+  # pronto para gerar builds automáticas a cada release.
+  #
+  # eas-build:
+  #   name: Build via EAS
+  #   runs-on: ubuntu-latest
+  #   needs: quality-gate
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 18
+  #         cache: npm
+  #     - run: npm ci
+  #     - uses: expo/expo-github-action@v8
+  #       with:
+  #         eas-version: latest
+  #         token: ${{ secrets.EXPO_TOKEN }}
+  #     - run: eas build --platform all --non-interactive --no-wait
