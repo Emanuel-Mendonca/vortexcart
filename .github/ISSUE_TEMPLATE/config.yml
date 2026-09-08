@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Dúvidas de uso ou contribuição
+    url: https://github.com/Emanuel-Mendonca/vortexcart/discussions
+    about: Use Discussions para perguntas gerais, não issues.
+  - name: Reportar vulnerabilidade de segurança
+    url: https://github.com/Emanuel-Mendonca/vortexcart/security/policy
+    about: Nunca reporte vulnerabilidades em uma issue pública — veja o SECURITY.md.

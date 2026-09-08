@@ -1,0 +1,6 @@
+# Configuração de patrocínio do GitHub (botão "Sponsor" no repositório).
+# Preencha com seus dados reais quando publicar, ou remova o arquivo se não for usar.
+# Documentação: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository
+
+github: [] # ex.: SEU-USUARIO
+custom: [] # ex.: ["https://www.buymeacoffee.com/seu-usuario"]

@@ -1,0 +1,9 @@
+# Cada linha atribui um dono a um padrão de arquivo/pasta.
+# O dono é automaticamente solicitado como revisor em PRs que tocam esses arquivos.
+# Substitua @Emanuel-Mendonca pelo seu usuário (ou time) do GitHub antes de publicar.
+
+* @Emanuel-Mendonca
+
+# Áreas sensíveis podem ter donos mais específicos no futuro, ex.:
+# /src/storage/ @Emanuel-Mendonca
+# /.github/ @Emanuel-Mendonca
