@@ -11,23 +11,15 @@
       "@/*": ["src/*"],
       "@/components/*": ["src/components/*"],
       "@/screens/*": ["src/screens/*"],
-      "@/hooks/*": ["src/hooks/*"],
       "@/store/*": ["src/store/*"],
       "@/services/*": ["src/services/*"],
       "@/storage/*": ["src/storage/*"],
       "@/utils/*": ["src/utils/*"],
       "@/types/*": ["src/types/*"],
       "@/constants/*": ["src/constants/*"],
-      "@/theme/*": ["src/theme/*"],
-      "@/navigation/*": ["src/navigation/*"],
-      "@/features/*": ["src/features/*"]
+      "@/theme/*": ["src/theme/*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-  ],
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
   "exclude": ["node_modules", "dist", "build"]
 }

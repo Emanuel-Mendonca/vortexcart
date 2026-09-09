@@ -1,6 +1,6 @@
 # Guia de Implementação — do scaffold ao GitHub
 
-Este documento assume que você já tem os arquivos da **Fase 1** (config + design tokens + tipos) e o entry point mínimo (`app/_layout.tsx`, `app/index.tsx`) que permite o projeto rodar. Ele cobre: preparar o ambiente, rodar o app localmente, e todo o fluxo de Git/GitHub até a primeira release.
+Este documento assume que você já tem os arquivos da **Fase 1** (config + design tokens + tipos) e o entry point que permite o projeto rodar (`app/_layout.tsx` e as rotas em `app/(tabs)/`). Ele cobre: preparar o ambiente, rodar o app localmente, e todo o fluxo de Git/GitHub até a primeira release.
 
 ---
 
@@ -8,13 +8,13 @@ Este documento assume que você já tem os arquivos da **Fase 1** (config + desi
 
 Instale antes de começar:
 
-| Ferramenta | Versão mínima | Como verificar |
-|---|---|---|
-| Node.js (LTS) | 18.x | `node -v` |
-| npm | 9.x (vem com o Node) | `npm -v` |
-| Git | qualquer recente | `git --version` |
-| Expo Go (app no celular) | — | App Store / Play Store |
-| Watchman (só macOS) | recente | `watchman -v` |
+| Ferramenta               | Versão mínima        | Como verificar         |
+| ------------------------ | -------------------- | ---------------------- |
+| Node.js (LTS)            | 18.x                 | `node -v`              |
+| npm                      | 9.x (vem com o Node) | `npm -v`               |
+| Git                      | qualquer recente     | `git --version`        |
+| Expo Go (app no celular) | —                    | App Store / Play Store |
+| Watchman (só macOS)      | recente              | `watchman -v`          |
 
 Android Studio (emulador Android) e Xcode (simulador iOS, só macOS) são opcionais — rodar no Expo Go pelo celular já é suficiente para desenvolver.
 
@@ -75,7 +75,9 @@ vortex-cart/
 └── tsconfig.json
 ```
 
-> `components/`, `screens/`, `storage/`, `store/` e `utils/` já vêm preenchidos com a Fase 2. As pastas ainda vazias (`hooks/`, `contexts/`, `services/`, `navigation/`, `features/`) são reservadas para funcionalidades futuras (Fase 3 em diante) — mantenha o `.gitkeep` até usá-las.
+> Todas as pastas de `src/` listadas acima têm código de verdade dentro. O projeto não mantém
+> pasta vazia "reservada pra depois" — quando uma nova camada for necessária (`hooks/`,
+> `contexts/` etc.), crie a pasta junto com o primeiro arquivo que vai morar nela.
 
 ---
 
@@ -87,11 +89,13 @@ Dentro da pasta do projeto:
 npm install
 ```
 
-Isso também dispara o script `prepare` do `package.json`, que ativa o Husky (`husky` sem argumentos, no Husky v9+). Se por algum motivo os hooks não ficarem executáveis, rode:
+Isso também dispara o script `prepare` do `package.json`, que ativa o Husky (`husky` sem argumentos, no Husky v9+). Se por algum motivo os hooks não ficarem executáveis **no Linux/macOS**, rode:
 
 ```bash
 chmod +x .husky/pre-commit .husky/commit-msg
 ```
+
+> No Windows isso não é necessário — não existe bit de execução de arquivo como no Linux/macOS, e o Git para Windows lida com isso sozinho.
 
 ---
 
@@ -140,15 +144,18 @@ O `.gitignore` já está configurado para ignorar `node_modules/`, `.expo/`, bui
 ## 6. Criar o repositório no GitHub
 
 ### Opção A — pelo site
+
 1. Acesse [github.com/new](https://github.com/new).
 2. Defina o nome do repositório (pode usar o placeholder por enquanto, ex.: `vortex-cart`, e renomear depois na Fase 6).
 3. Deixe **Add a README**, **.gitignore** e **License** desmarcados — já temos tudo isso localmente.
 4. Clique em **Create repository** e copie a URL exibida (HTTPS ou SSH).
 
 ### Opção B — pelo GitHub CLI
+
 ```bash
 gh repo create vortex-cart --private --source=. --remote=origin
 ```
+
 (troque `--private` por `--public` se quiser o repositório público desde já; o `--source=.` já conecta o remoto automaticamente, então pode pular a seção 7).
 
 ---
@@ -261,9 +268,11 @@ git push origin v0.1.0
 Depois, transforme a tag numa Release:
 
 ### Pelo site
+
 **Releases → Draft a new release** → selecione a tag `v0.1.0` → escreva o resumo (o que entrou nessa versão) → **Publish release**.
 
 ### Pelo GitHub CLI
+
 ```bash
 gh release create v0.1.0 --title "v0.1.0 — Scaffold inicial" \
   --notes "Config do projeto (Expo + TypeScript + ESLint/Prettier/Husky), design tokens e tipos de domínio."
@@ -275,7 +284,7 @@ Repita esse ciclo (branch → PR → merge → `npm version` → tag → release
 
 ## 12. Próximos passos
 
-- **Fase 2**: banco SQLite, store Zustand, navegação real e as 4 telas — vai substituir `app/index.tsx` pela navegação em tabs de verdade.
+- **Fase 2**: banco SQLite, store Zustand, navegação real e as 4 telas — substitui a rota única inicial pela navegação em tabs de verdade (`app/(tabs)/`).
 - **Fase 5**: GitHub Actions (lint, typecheck, testes e build automáticos a cada push/PR) — quando existir, as branch protection rules da seção 8 passam a exigir esses checks passando antes do merge.
 
 ## Checklist rápido desta etapa

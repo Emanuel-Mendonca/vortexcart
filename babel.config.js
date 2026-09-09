@@ -11,16 +11,13 @@ module.exports = function (api) {
             '@': './src',
             '@/components': './src/components',
             '@/screens': './src/screens',
-            '@/hooks': './src/hooks',
             '@/store': './src/store',
             '@/services': './src/services',
             '@/storage': './src/storage',
             '@/utils': './src/utils',
             '@/types': './src/types',
             '@/constants': './src/constants',
-            '@/theme': './src/theme',
-            '@/navigation': './src/navigation',
-            '@/features': './src/features'
+            '@/theme': './src/theme'
           },
           extensions: ['.ios.ts', '.android.ts', '.ts', '.ios.tsx', '.android.tsx', '.tsx', '.jsx', '.js', '.json']
         }

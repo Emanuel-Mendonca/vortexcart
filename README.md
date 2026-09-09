@@ -7,8 +7,8 @@
 <p align="center">
   <img alt="Expo SDK" src="https://img.shields.io/badge/Expo-SDK%2051-000020?logo=expo&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white">
-  <img alt="License" src="https://img.shields.io/badge/license-MIT-4F1FFF">
-  <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-D8F33D">
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-625788">
+  <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-D3C87C">
 </p>
 
 ---
@@ -21,15 +21,13 @@ O Vortex Cart nasceu de uma planilha Excel usada para acompanhar os gastos do me
 
 ## Capturas de tela
 
-> _Screenshots reais entram aqui assim que o app rodar em um dispositivo/emulador — por enquanto, os placeholders abaixo marcam onde cada uma vai._
+| Nova Compra                                                                       | Histórico                                                                     |
+| --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| <img src="docs/screenshots/1_nova_compra.png" alt="Tela Nova Compra" width="240"> | <img src="docs/screenshots/2_historico.png" alt="Tela Histórico" width="240"> |
 
-| Nova Compra | Histórico |
-|---|---|
-| `docs/screenshots/nova-compra.png` | `docs/screenshots/historico.png` |
-
-| Resumo | Itens |
-|---|---|
-| `docs/screenshots/resumo.png` | `docs/screenshots/itens.png` |
+| Resumo                                                                  | Itens                                                                 |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| <img src="docs/screenshots/3_resumo.png" alt="Tela Resumo" width="240"> | <img src="docs/screenshots/4_itens.png" alt="Tela Itens" width="240"> |
 
 ## Funcionalidades
 
@@ -43,16 +41,16 @@ O Vortex Cart nasceu de uma planilha Excel usada para acompanhar os gastos do me
 
 ## Tecnologias
 
-| Camada | Escolha | Por quê (resumo — detalhes em [ARCHITECTURE.md](./ARCHITECTURE.md)) |
-|---|---|---|
-| Framework | React Native + Expo (SDK 51) | Managed workflow, sem necessidade de configuração nativa manual |
-| Linguagem | TypeScript (strict) | Segurança de tipos em todo o domínio de dados |
-| Navegação | Expo Router | Roteamento baseado em arquivos, menos boilerplate |
-| Estado | Zustand | Simples e suficiente para um app 100% offline (sem cache de servidor) |
-| Persistência | expo-sqlite | Consultas relacionais (SUM/AVG/GROUP BY) para os relatórios de gasto |
-| Formulários | React Hook Form + Zod | Validação tipada e performática |
-| Exportação | expo-file-system, expo-sharing, expo-print, expo-document-picker | Geração e compartilhamento de JSON/CSV/PDF, e importação de backup |
-| Qualidade | ESLint, Prettier, Husky, lint-staged, Commitlint | Consistência de código e commits |
+| Camada       | Escolha                                                          | Por quê (resumo — detalhes em [ARCHITECTURE.md](./ARCHITECTURE.md))   |
+| ------------ | ---------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Framework    | React Native + Expo (SDK 51)                                     | Managed workflow, sem necessidade de configuração nativa manual       |
+| Linguagem    | TypeScript (strict)                                              | Segurança de tipos em todo o domínio de dados                         |
+| Navegação    | Expo Router                                                      | Roteamento baseado em arquivos, menos boilerplate                     |
+| Estado       | Zustand                                                          | Simples e suficiente para um app 100% offline (sem cache de servidor) |
+| Persistência | expo-sqlite                                                      | Consultas relacionais (SUM/AVG/GROUP BY) para os relatórios de gasto  |
+| Formulários  | React Hook Form + Zod                                            | Validação tipada e performática                                       |
+| Exportação   | expo-file-system, expo-sharing, expo-print, expo-document-picker | Geração e compartilhamento de JSON/CSV/PDF, e importação de backup    |
+| Qualidade    | ESLint, Prettier, Husky, lint-staged, Commitlint                 | Consistência de código e commits                                      |
 
 ## Instalação
 
@@ -81,7 +79,9 @@ instalável (sem depender do Expo Go), veja [PUBLICACAO.md](./PUBLICACAO.md).
 ```
 app/            rotas (Expo Router) — telas montadas a partir de src/screens
 src/
+  assets/       ícone, splash e favicon do app
   components/   componentes de UI reutilizáveis
+  constants/    catálogo inicial, categorias e nome do banco
   screens/      as 4 telas do app
   storage/      camada SQLite (schema + repositórios)
   services/     exportação/importação de dados

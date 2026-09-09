@@ -41,71 +41,78 @@ blocos abaixo na ordem — cada `git add` seleciona só os arquivos daquele assu
 
 ### 3.1 — Scaffold e ferramentas
 
-```bash
-git add package.json package-lock.json tsconfig.json babel.config.js app.config.ts eas.json \
-  .eslintrc.js .prettierrc .prettierignore .editorconfig .gitignore commitlint.config.js \
-  jest.config.js .husky .vscode
+```powershell
+git add package.json package-lock.json tsconfig.json babel.config.js app.config.ts eas.json .eslintrc.js .prettierrc .prettierignore .editorconfig .gitignore commitlint.config.js jest.config.js .husky .vscode
 git commit -m "chore: scaffold inicial do projeto (Expo + TypeScript + ferramentas de qualidade)"
 ```
 
 ### 3.2 — Identidade visual
 
-```bash
+```powershell
 git add src/theme src/constants src/assets BRANDING.md
 git commit -m "feat(branding): design tokens, paleta e identidade visual do Vortex Cart"
 ```
 
 ### 3.3 — Tipos, utilitários e banco de dados
 
-```bash
+```powershell
 git add src/types src/utils src/storage
 git commit -m "feat(storage): tipos de dominio, utilitarios e schema SQLite"
 ```
 
 ### 3.4 — Estado global
 
-```bash
+```powershell
 git add src/store
 git commit -m "feat(store): estado global com Zustand"
 ```
 
 ### 3.5 — Interface e navegação
 
-```bash
+```powershell
 git add src/components src/screens app
 git commit -m "feat(ui): componentes, telas e navegacao com Expo Router"
 ```
 
 ### 3.6 — Exportação e importação de dados
 
-```bash
+```powershell
 git add src/services
 git commit -m "feat(export): exportacao e importacao de dados em JSON, CSV e PDF"
 ```
 
 ### 3.7 — Documentação open source
 
-```bash
-git add README.md LICENSE CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md CHANGELOG.md \
-  ROADMAP.md BACKLOG.md TESTPLAN.md ARCHITECTURE.md STYLEGUIDE.md SUPPORT.md \
-  IMPLEMENTACAO.md .github/ISSUE_TEMPLATE .github/PULL_REQUEST_TEMPLATE.md \
-  .github/CODEOWNERS .github/FUNDING.yml
+```powershell
+git add README.md LICENSE CONTRIBUTING.md CODE_OF_CONDUCT.md SECURITY.md CHANGELOG.md ROADMAP.md BACKLOG.md TESTPLAN.md ARCHITECTURE.md STYLEGUIDE.md SUPPORT.md IMPLEMENTACAO.md .github/ISSUE_TEMPLATE .github/PULL_REQUEST_TEMPLATE.md .github/CODEOWNERS .github/FUNDING.yml
 git commit -m "docs: documentacao open source completa"
 ```
 
 ### 3.8 — CI/CD e qualidade contínua
 
-```bash
-git add .github/workflows/ci.yml .github/workflows/release.yml .github/workflows/codeql.yml \
-  .github/dependabot.yml
+```powershell
+git add .github/workflows/ci.yml .github/workflows/release.yml .github/workflows/codeql.yml .github/dependabot.yml
 git commit -m "ci: pipelines de lint, testes, release e analise de seguranca"
 ```
 
 ### 3.9 — Landing page e publicação web
 
-```bash
+```powershell
 git add docs .github/workflows/deploy-landing.yml PUBLICACAO.md
 git commit -m "feat(web): landing page e publicacao automatica no GitHub Pages"
+```
+
+### 3.10 — Limpeza de arquivos sem uso
+
+Rotas vazias (`app/index.tsx` e `app/layout.tsx`, que colidiam com `app/(tabs)/index.tsx` e
+com o layout real `app/_layout.tsx`), os `.gitkeep` de pastas que já têm código, as pastas
+`src/contexts`, `src/features`, `src/hooks` e `src/navigation` — que existiam vazias,
+"reservadas pro futuro" — e a dependência `expo-secure-store`, que não era importada em lugar
+nenhum:
+
+```powershell
+git add -A
+git commit -m "chore: remove rotas vazias, pastas reservadas e dependencia sem uso"
 ```
 
 ### Conferir o histórico
@@ -114,7 +121,7 @@ git commit -m "feat(web): landing page e publicacao automatica no GitHub Pages"
 git log --oneline
 ```
 
-Você deve ver 9 commits, cada um com um assunto claro.
+Cada commit deve ter um assunto claro.
 
 ---
 
@@ -128,6 +135,7 @@ git push -u origin main
 ```
 
 ### Branch de integração (opcional, mas recomendado — ver IMPLEMENTACAO.md seção 8)
+
 ```bash
 git checkout -b develop
 git push -u origin develop
@@ -181,7 +189,7 @@ Quando quiser gerar a versão "de loja" (Google Play / App Store):
 npm run build:production
 ```
 
-> Isso ainda não *publica* nas lojas — só gera o artefato (`.aab`/`.ipa`). Publicar nas lojas
+> Isso ainda não _publica_ nas lojas — só gera o artefato (`.aab`/`.ipa`). Publicar nas lojas
 > exige contas de desenvolvedor pagas (Google Play: taxa única; Apple: anual) e está fora do
 > escopo deste guia gratuito.
 
@@ -203,7 +211,7 @@ Depois, transforme a tag em Release (site do GitHub, **Releases → Draft a new 
 
 ## Checklist final
 
-- [ ] `git log --oneline` mostra os 9 commits organizados por assunto
+- [ ] `git log --oneline` mostra os 10 commits organizados por assunto
 - [ ] Repositório conectado (`git remote add origin ...`) e `git push` concluído
 - [ ] GitHub Pages configurado (Settings → Pages → Source: GitHub Actions)
 - [ ] Landing page acessível em `https://emanuel-mendonca.github.io/vortexcart/`
