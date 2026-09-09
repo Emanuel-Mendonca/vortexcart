@@ -1,0 +1,25 @@
+# Normalização de fim de linha
+# ---------------------------------------------------------------------
+# O `.prettierrc` exige `endOfLine: "lf"`, mas o Git no Windows costuma vir
+# com `core.autocrlf=true`, que reescreve os arquivos com CRLF ao gravá-los
+# na working tree. Sem este arquivo, qualquer operação que faça o Git
+# reescrever um arquivo (checkout, stash pop, o revert do lint-staged) deixa
+# o ESLint acusando `Delete ␍` em todas as linhas do projeto.
+#
+# `eol=lf` força LF na working tree em qualquer sistema operacional,
+# independente do `core.autocrlf` de cada contribuidor.
+* text=auto eol=lf
+
+# Binários — nunca normalizar.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.jks binary
+*.keystore binary
