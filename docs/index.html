@@ -3,153 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vortex Cart — controle suas compras de mercado</title>
-<meta name="description" content="Vortex Cart: registre suas compras de mercado e descubra em qual supermercado seu dinheiro rende mais. 100% offline.">
+<title>Vortex Cart — suas compras de mercado, organizadas</title>
+<meta name="description" content="Vortex Cart: registre suas compras de mercado e descubra em qual supermercado seu dinheiro rende mais. Funciona offline e online.">
 <link rel="icon" href="screenshots/vortex-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --purple: #4F1FFF;
-    --purple-dark: #3F19CC;
-    --lime: #D8F33D;
-    --black: #000000;
-    --white: #FFFFFF;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    font-family:'Raleway',sans-serif;
-    background:var(--white);
-    color:var(--black);
-  }
-  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
-
-  header{
-    background:var(--black);
-    padding:18px 0;
-  }
-  header .wrap{display:flex;align-items:center;justify-content:space-between;}
-  .brand{display:flex;align-items:center;gap:10px;}
-  .brand img{width:34px;height:34px;border-radius:8px;}
-  .brand span{color:var(--white);font-weight:800;font-size:1.1rem;}
-  .brand b{color:var(--lime);}
-  nav a{color:var(--white);text-decoration:none;font-weight:600;font-size:0.9rem;margin-left:24px;}
-  nav a:hover{color:var(--lime);}
-
-  .hero{
-    background:var(--purple);
-    color:var(--white);
-    padding:70px 0 90px;
-    text-align:center;
-  }
-  .hero h1{
-    font-size:2.6rem;
-    font-weight:800;
-    margin:0 0 16px;
-    line-height:1.15;
-  }
-  .hero h1 span{background:var(--lime);color:var(--black);padding:2px 12px;border-radius:8px;}
-  .hero p{
-    font-size:1.15rem;
-    max-width:560px;
-    margin:0 auto 32px;
-    color:rgba(255,255,255,0.88);
-    line-height:1.5;
-  }
-  .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
-  .btn{
-    display:inline-block;
-    padding:14px 26px;
-    border-radius:8px;
-    font-weight:800;
-    font-size:0.95rem;
-    text-decoration:none;
-    border:2px solid var(--black);
-  }
-  .btn-primary{background:var(--lime);color:var(--black);}
-  .btn-secondary{background:transparent;color:var(--white);border-color:var(--white);}
-  .btn:hover{opacity:0.88;}
-
-  .badge-soon{
-    display:inline-block;
-    margin-top:18px;
-    font-size:0.78rem;
-    font-weight:700;
-    color:rgba(255,255,255,0.75);
-    border:1.5px dashed rgba(255,255,255,0.5);
-    padding:6px 14px;
-    border-radius:20px;
-  }
-
-  section{padding:70px 0;}
-  h2{font-size:1.8rem;font-weight:800;text-align:center;margin:0 0 12px;}
-  .subtitle{text-align:center;color:#555;max-width:560px;margin:0 auto 48px;line-height:1.5;}
-
-  .features{
-    display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(230px, 1fr));
-    gap:24px;
-  }
-  .feature{
-    border:2px solid var(--black);
-    border-radius:14px;
-    padding:24px;
-    box-shadow:0 6px 0 rgba(0,0,0,0.9);
-  }
-  .feature .icon{
-    width:44px;height:44px;border-radius:10px;
-    background:var(--purple);color:var(--white);
-    display:flex;align-items:center;justify-content:center;
-    font-size:1.3rem;font-weight:800;margin-bottom:14px;
-  }
-  .feature h3{margin:0 0 8px;font-size:1.05rem;}
-  .feature p{margin:0;color:#555;font-size:0.92rem;line-height:1.5;}
-
-  .screens{background:#F7F7F7;}
-  .screens-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
-    gap:28px;
-  }
-  .screen-card{text-align:center;}
-  .screen-card img{
-    width:100%;
-    max-width:260px;
-    border:2px solid var(--black);
-    border-radius:16px;
-    box-shadow:0 8px 0 rgba(0,0,0,0.9);
-  }
-  .screen-card p{font-weight:700;margin-top:14px;font-size:0.92rem;}
-
-  .roadmap-note{
-    background:var(--black);
-    color:var(--white);
-    border-radius:16px;
-    padding:32px;
-    text-align:center;
-    max-width:700px;
-    margin:0 auto;
-  }
-  .roadmap-note h3{color:var(--lime);margin:0 0 10px;font-size:1.1rem;}
-  .roadmap-note p{color:rgba(255,255,255,0.85);line-height:1.6;margin:0;font-size:0.95rem;}
-
-  footer{
-    background:var(--black);
-    color:rgba(255,255,255,0.7);
-    padding:32px 0;
-    text-align:center;
-    font-size:0.85rem;
-  }
-  footer a{color:var(--lime);text-decoration:none;}
-
-  @media (max-width:560px){
-    .hero h1{font-size:1.9rem;}
-    nav{display:none;}
-  }
-</style>
+<link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<link href="assets/css/landing.css" rel="stylesheet">
 </head>
 <body>
+
+<div class="glow glow--1"></div>
+<div class="glow glow--2"></div>
+<div class="glow glow--3"></div>
 
 <header>
   <div class="wrap">
@@ -167,48 +34,65 @@
 
 <section class="hero">
   <div class="wrap">
-    <h1>Suas compras de mercado, <span>organizadas</span>.</h1>
-    <p>Registre o que você compra, em qual supermercado, e descubra onde seu dinheiro rende mais — mês a mês, 100% offline, direto no seu celular.</p>
+    <div class="badge"><span class="dot"></span> VORTEX CART</div>
+    <h1>Suas compras de mercado, <span>organizadas em órbita</span>.</h1>
+    <p>Registre o que você compra, em qual supermercado, e descubra onde seu dinheiro rende mais, mês a mês, funcionando offline e online.</p>
     <div class="cta-row">
-      <a class="btn btn-primary" href="#download">Baixar o app</a>
-      <a class="btn btn-secondary" href="https://github.com/Emanuel-Mendonca/vortexcart">Ver no GitHub</a>
+      <a class="btn btn-primary" href="https://github.com/Emanuel-Mendonca/vortexcart/releases">
+        <span class="material-symbols-outlined icon-inline">android</span> Android
+      </a>
+      <a class="btn btn-primary" href="https://github.com/Emanuel-Mendonca/vortexcart/releases">
+        <span class="material-symbols-outlined icon-inline">phone_iphone</span> iOS
+      </a>
+      <a class="btn btn-secondary" href="#download">Acessar plataforma web</a>
     </div>
-    <div class="badge-soon">📱 Build para Android/iOS em breve — acompanhe no repositório</div>
+
+    <div class="orbit-frame">
+      <svg viewBox="0 0 400 400" fill="none">
+        <circle cx="200" cy="200" r="180" stroke="rgba(194,193,251,0.5)" stroke-width="1.2" stroke-dasharray="6 8"/>
+        <circle cx="200" cy="200" r="140" stroke="rgba(204,191,247,0.4)" stroke-width="0.8" stroke-dasharray="3 6"/>
+        <circle cx="200" cy="200" r="100" stroke="rgba(211,200,124,0.35)" stroke-width="1.5" stroke-dasharray="12 12"/>
+      </svg>
+      <div class="device">
+        <img src="screenshots/1_nova_compra.png" alt="Tela Nova Compra do Vortex Cart">
+      </div>
+    </div>
   </div>
 </section>
 
 <section id="funcionalidades">
   <div class="wrap">
-    <h2>O que o Vortex Cart faz</h2>
-    <p class="subtitle">Pensado pra resolver um problema real: saber pra onde o dinheiro do mercado está indo, sem precisar de planilha.</p>
+    <div class="eyebrow"><span class="material-symbols-outlined">auto_awesome</span> Funcionalidades</div>
+    <h2>Pensado pra resolver um problema real</h2>
+    <p class="subtitle">Saber pra onde o dinheiro do mercado está indo, sem precisar de planilha.</p>
     <div class="features">
       <div class="feature">
-        <div class="icon">🛒</div>
+        <div class="icon"><span class="material-symbols-outlined">add_shopping_cart</span></div>
         <h3>Registrar compra</h3>
-        <p>Mês, supermercado e itens com quantidade e valor — subtotal e total calculados na hora.</p>
+        <p>Mês, supermercado e itens com quantidade, valor, subtotal e total calculados na hora.</p>
       </div>
       <div class="feature">
-        <div class="icon">🕘</div>
+        <div class="icon"><span class="material-symbols-outlined">history</span></div>
         <h3>Histórico completo</h3>
         <p>Compras agrupadas por mês, com filtro por mercado, edição e exclusão.</p>
       </div>
       <div class="feature">
-        <div class="icon">📊</div>
+        <div class="icon"><span class="material-symbols-outlined">bar_chart</span></div>
         <h3>Comparação de mercados</h3>
-        <p>Veja o gasto por mês e qual supermercado sai mais em conta, com um selo de "mais econômico".</p>
+        <p>Gasto por mês e qual supermercado sai mais em conta, com selo de "mais econômico".</p>
       </div>
       <div class="feature">
-        <div class="icon">📤</div>
+        <div class="icon"><span class="material-symbols-outlined">ios_share</span></div>
         <h3>Exportar e importar</h3>
-        <p>JSON, CSV e PDF com um toque — e restaure um backup a qualquer momento, sem perder dados.</p>
+        <p>JSON, CSV e PDF com um toque. Restaure um backup a qualquer momento, sem perder dados.</p>
       </div>
       <div class="feature">
-        <div class="icon">🔒</div>
-        <h3>100% offline</h3>
-        <p>Nenhum dado sai do seu aparelho. Sem conta, sem login, sem servidor.</p>
+        <div class="icon"><span class="material-symbols-outlined">sync</span></div>
+        <h3>Offline e online</h3>
+        <p>Funciona sem internet no celular e a versão que roda direto pela web já está a caminho.</p>
       </div>
       <div class="feature">
-        <div class="icon">🌓</div>
+        <div class="icon"><span class="material-symbols-outlined">contrast</span></div>
         <h3>Tema claro e escuro</h3>
         <p>Segue automaticamente a preferência do seu sistema.</p>
       </div>
@@ -216,43 +100,58 @@
   </div>
 </section>
 
-<section id="telas" class="screens">
+<section id="telas">
   <div class="wrap">
-    <h2>Telas do app</h2>
-    <p class="subtitle">Capturas reais do app rodando — não são mockups.</p>
+    <div class="eyebrow"><span class="material-symbols-outlined">grid_view</span> Telas do app</div>
+    <h2>Capturas reais, não mockups</h2>
+    <p class="subtitle">O app rodando de verdade.</p>
     <div class="screens-grid">
       <div class="screen-card">
-        <img src="screenshots/1_nova_compra.png" alt="Tela Nova Compra">
+        <div class="frame"><img src="screenshots/1_nova_compra.png" alt="Tela Nova Compra"></div>
         <p>Nova Compra</p>
       </div>
       <div class="screen-card">
-        <img src="screenshots/2_historico.png" alt="Tela Histórico">
+        <div class="frame"><img src="screenshots/2_historico.png" alt="Tela Histórico"></div>
         <p>Histórico</p>
       </div>
       <div class="screen-card">
-        <img src="screenshots/3_resumo.png" alt="Tela Resumo">
+        <div class="frame"><img src="screenshots/3_resumo.png" alt="Tela Resumo"></div>
         <p>Resumo</p>
       </div>
       <div class="screen-card">
-        <img src="screenshots/4_itens.png" alt="Tela Itens">
+        <div class="frame"><img src="screenshots/4_itens.png" alt="Tela Itens"></div>
         <p>Itens</p>
       </div>
     </div>
   </div>
 </section>
 
+<section class="quote-section">
+  <div class="wrap">
+    <div class="quote-card">
+      <blockquote>"Controlar o mercado deveria ser simples."</blockquote>
+      <p>Um vórtice puxa três eixos: item, mercado, mês para um único resultado central: <b>quanto você realmente gastou, e onde.</b></p>
+    </div>
+  </div>
+</section>
+
 <section id="download">
   <div class="wrap">
-    <div class="roadmap-note">
-      <h3>Sobre a versão web</h3>
+    <div class="note-card">
+      <h3>Como o Vortex Cart surgiu</h3>
       <p>
-        O Vortex Cart usa um banco de dados local (SQLite) que hoje só funciona nos apps
-        nativos Android/iOS — por isso esta página é uma vitrine, não o app em si.
-        Uma versão totalmente funcional no navegador está no roadmap do projeto
-        (ver <a href="https://github.com/Emanuel-Mendonca/vortexcart/blob/main/ROADMAP.md" style="color:var(--lime)">ROADMAP.md</a>),
-        com uma camada de armazenamento própria para web. Por enquanto, baixe o build
-        Android/iOS a partir das
-        <a href="https://github.com/Emanuel-Mendonca/vortexcart/releases" style="color:var(--lime)">Releases do GitHub</a>.
+        Tudo começou com uma planilha de Excel usada pra acompanhar os gastos do mercado de
+        casa, mês a mês, supermercado por supermercado. Quanto mais a planilha crescia, mais
+        claro ficava que faltava algo mais simples de usar e direto no bolso, sem precisar
+        da complexidade da interface do Excel.
+      </p>
+      <p>
+        Foi daí que nasceu o Vortex Cart: um app pra registrar o que você compra, em qual
+        mercado, e descobrir onde o seu dinheiro rende mais. Funciona direto no celular sem
+        precisar de internet, e uma versão para acessar pela web já está a caminho.
+        Acompanhe a evolução no <a href="https://github.com/Emanuel-Mendonca/vortexcart/blob/main/ROADMAP.md">roadmap do projeto</a>
+        ou baixe a versão mais recente nas
+        <a href="https://github.com/Emanuel-Mendonca/vortexcart/releases">Releases do GitHub</a>.
       </p>
     </div>
   </div>
@@ -260,8 +159,8 @@
 
 <footer>
   <div class="wrap">
-    <p>Vortex Cart é um projeto open source, licenciado sob MIT.<br>
-    <a href="https://github.com/Emanuel-Mendonca/vortexcart">github.com/Emanuel-Mendonca/vortexcart</a></p>
+    <p>Vortex Cart é um projeto open source, licenciado sob MIT.</p>
+    <p><a href="https://github.com/Emanuel-Mendonca/vortexcart">github.com/Emanuel-Mendonca/vortexcart</a></p>
   </div>
 </footer>
 
