@@ -2,16 +2,20 @@
  * Design Tokens
  * -----------------------------------------------------------------------
  * Fonte única de verdade para cores, tipografia, espaçamento e raios.
- * A paleta reaproveita a identidade já criada para a versão web do
- * "Controle da Compra": roxo elétrico + lima + preto sobre branco,
- * com bordas grossas e sombras "hard" (offset sólido, sem blur).
+ *
+ * Paleta "Vortex" — atmosférica, cósmica, glassmorphism. Extraída de um
+ * esquema Material Design 3 (tons "primary/secondary/tertiary/surface"
+ * completos, fornecidos para o tema escuro). O tema claro foi derivado
+ * usando os próprios tokens "inverse-*" e "*-fixed*" do M3, que existem
+ * exatamente para compor a versão oposta do tema de forma consistente
+ * com a mesma paleta — não são cores inventadas à parte.
  */
 
 export const palette = {
-  purple: '#4F1FFF',
-  purpleDark: '#3F19CC',
-  lime: '#D8F33D',
-  black: '#000000',
+  lavender: '#CCBFF7',
+  lavenderDeep: '#625788', // "inverse-primary" do M3 — primary do tema claro
+  gold: '#D3C87C',
+  night: '#10131B',
   white: '#FFFFFF'
 } as const;
 
@@ -37,35 +41,35 @@ export const colorTokens: Record<'light' | 'dark', ColorPalette> = {
   light: {
     background: palette.white,
     surface: palette.white,
-    surfaceAlt: '#F4F4F4',
-    text: palette.black,
-    textMuted: 'rgba(0,0,0,0.55)',
-    textFaint: 'rgba(0,0,0,0.35)',
-    border: palette.black,
-    borderMuted: 'rgba(0,0,0,0.14)',
-    primary: palette.purple,
-    primaryPressed: palette.purpleDark,
+    surfaceAlt: '#F3F0FA', // tonalidade clara da família lavanda
+    text: '#1E1341', // "on-primary-fixed" — texto escuro com matiz roxo
+    textMuted: 'rgba(30,19,65,0.62)',
+    textFaint: 'rgba(30,19,65,0.4)',
+    border: '#7A7290',
+    borderMuted: 'rgba(74,64,111,0.18)',
+    primary: palette.lavenderDeep, // "inverse-primary" do M3
+    primaryPressed: '#4A406F', // "on-primary-fixed-variant"
     onPrimary: palette.white,
-    accent: palette.lime,
-    onAccent: palette.black,
-    danger: palette.black,
-    overlay: 'rgba(0,0,0,0.6)'
+    accent: palette.gold, // "tertiary"
+    onAccent: '#363100', // "on-tertiary"
+    danger: '#BA1A1A',
+    overlay: 'rgba(16,19,27,0.6)'
   },
   dark: {
-    background: palette.black,
-    surface: '#111111',
-    surfaceAlt: '#1B1B1B',
-    text: palette.white,
-    textMuted: 'rgba(255,255,255,0.6)',
-    textFaint: 'rgba(255,255,255,0.4)',
-    border: palette.white,
-    borderMuted: 'rgba(255,255,255,0.16)',
-    primary: '#7B5CFF',
-    primaryPressed: palette.purple,
-    onPrimary: palette.white,
-    accent: palette.lime,
-    onAccent: palette.black,
-    danger: '#FF6B6B',
+    background: palette.night, // "background" / "surface"
+    surface: '#1D1F28', // "surface-container"
+    surfaceAlt: '#272A32', // "surface-container-high"
+    text: '#E1E2EE', // "on-surface"
+    textMuted: 'rgba(225,226,238,0.65)',
+    textFaint: 'rgba(225,226,238,0.4)',
+    border: '#938F99', // "outline"
+    borderMuted: '#48454E', // "outline-variant"
+    primary: palette.lavender, // "primary"
+    primaryPressed: '#B2A6DC', // "on-primary-container"
+    onPrimary: '#332957', // "on-primary"
+    accent: palette.gold, // "tertiary"
+    onAccent: '#363100', // "on-tertiary"
+    danger: '#FFB4AB', // "error"
     overlay: 'rgba(0,0,0,0.75)'
   }
 };
@@ -93,10 +97,14 @@ export const radii = {
   pill: 999
 } as const;
 
-// offset sólido (sem blur) para o efeito de "sombra dura" da identidade visual
+/**
+ * Sombras suaves e "glow" colorido, para o efeito glassmorphism —
+ * substituem o offset sólido/hard-edge da identidade anterior.
+ */
 export const shadows = {
-  sm: { offset: 3 },
-  md: { offset: 6 }
+  sm: { offsetY: 4, blur: 12, opacity: 0.22 },
+  md: { offsetY: 10, blur: 28, opacity: 0.32 },
+  glow: { offsetY: 0, blur: 24, opacity: 0.4 }
 } as const;
 
 export const fontFamily = {
@@ -119,5 +127,5 @@ export const typeScale = {
 export const borderWidth = {
   hairline: 1,
   thin: 1.5,
-  bold: 2
+  bold: 1.5
 } as const;

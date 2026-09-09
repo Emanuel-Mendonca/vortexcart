@@ -15,6 +15,13 @@ export interface Mercado {
 export interface CatalogoItem {
   id: number;
   nome: string;
+  categoria: string;
+}
+
+export interface PrecoMedioItem {
+  nome: string;
+  precoMedio: number;
+  quantidadeCompras: number;
 }
 
 export interface ItemCompra {

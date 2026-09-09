@@ -31,7 +31,9 @@ export function Button({
         ? theme.colors.background
         : 'transparent';
   const textColor = variant === 'primary' ? theme.colors.onPrimary : theme.colors.text;
-  const borderColor = variant === 'ghost' ? 'transparent' : theme.colors.border;
+  const borderColor =
+    variant === 'primary' || variant === 'ghost' ? 'transparent' : theme.colors.border;
+  const glow = theme.shadows.glow;
 
   return (
     <Pressable
@@ -42,8 +44,17 @@ export function Button({
         {
           backgroundColor,
           borderColor,
-          borderWidth: variant === 'ghost' ? 0 : theme.borderWidth.bold,
-          opacity: isDisabled ? 0.5 : pressed ? 0.85 : 1
+          borderWidth: variant === 'secondary' ? theme.borderWidth.hairline : 0,
+          opacity: isDisabled ? 0.5 : pressed ? 0.85 : 1,
+          ...(variant === 'primary'
+            ? {
+                shadowColor: theme.colors.primary,
+                shadowOffset: { width: 0, height: glow.offsetY },
+                shadowOpacity: glow.opacity,
+                shadowRadius: glow.blur,
+                elevation: 6
+              }
+            : null)
         }
       ]}
     >

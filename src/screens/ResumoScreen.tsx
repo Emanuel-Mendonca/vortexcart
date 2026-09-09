@@ -1,7 +1,10 @@
-import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useMemo, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import Svg, { Polyline } from 'react-native-svg';
 
-import { Badge, Button, Card, ConfirmModal, EmptyState } from '@/components';
+import { AmbientGlow, Badge, Card, EmptyState, Toast } from '@/components';
 import {
   ExportIndisponivelError,
   ImportCanceladoError,
@@ -18,6 +21,8 @@ import { monthLabel } from '@/utils/date';
 
 type Operacao = 'json' | 'csv' | 'pdf' | 'importar' | null;
 
+const CHART_HEIGHT = 130;
+
 export function ResumoScreen() {
   const scheme = useColorScheme();
   const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
@@ -29,26 +34,35 @@ export function ResumoScreen() {
   const refreshTudo = useComprasStore((s) => s.refreshTudo);
 
   const [operacaoEmAndamento, setOperacaoEmAndamento] = useState<Operacao>(null);
-  const [mensagem, setMensagem] = useState<string | null>(null);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [mesSelecionado, setMesSelecionado] = useState<string | null>(null);
 
   const maxMes = Math.max(1, ...gastoPorMes.map((g) => g.total));
+  const totalPeriodo = gastoPorMes.reduce((s, g) => s + g.total, 0);
+  const mediaMensal = gastoPorMes.length > 0 ? totalPeriodo / gastoPorMes.length : 0;
 
-  async function rodar(operacao: Operacao, acao: () => Promise<void>, sucesso?: string) {
+  const variacao = useMemo(() => {
+    if (gastoPorMes.length < 2) return null;
+    const atual = gastoPorMes[gastoPorMes.length - 1]!.total;
+    const anterior = gastoPorMes[gastoPorMes.length - 2]!.total;
+    if (anterior === 0) return null;
+    return ((atual - anterior) / anterior) * 100;
+  }, [gastoPorMes]);
+
+  const maxMercado = Math.max(1, ...comparativoMercados.map((m) => m.totalGasto));
+
+  async function rodar(operacao: Operacao, acao: () => Promise<void>) {
     setOperacaoEmAndamento(operacao);
     try {
       await acao();
-      if (sucesso) setMensagem(sucesso);
     } catch (erro) {
-      if (erro instanceof ImportCanceladoError) {
-        // usuário cancelou o seletor de arquivo — não é um erro a mostrar
-        return;
-      }
+      if (erro instanceof ImportCanceladoError) return;
       if (erro instanceof ExportIndisponivelError || erro instanceof ImportInvalidoError) {
-        setMensagem(erro.message);
+        setToastMsg(erro.message);
         return;
       }
       console.error(erro);
-      setMensagem('Algo deu errado. Tente novamente.');
+      setToastMsg('Algo deu errado. Tente novamente.');
     } finally {
       setOperacaoEmAndamento(null);
     }
@@ -58,257 +72,513 @@ export function ResumoScreen() {
     await rodar('importar', async () => {
       const resultado = await selecionarEImportarBackup();
       await refreshTudo();
-      setMensagem(`Importação concluída: ${resultado.comprasImportadas} compra(s) adicionada(s).`);
+      setToastMsg(`${resultado.comprasImportadas} compra(s) importada(s) com sucesso`);
     });
   }
 
   return (
-    <ScrollView
-      style={{ backgroundColor: theme.colors.background }}
-      contentContainerStyle={{ padding: theme.spacing.lg }}
-    >
-      <Card>
-        <Text
-          style={{
-            fontFamily: theme.fontFamily.extraBold,
-            fontSize: theme.type.title.fontSize,
-            color: theme.colors.text,
-            marginBottom: 16
-          }}
+    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <ScrollView contentContainerStyle={{ padding: theme.spacing.lg, paddingBottom: 40 }}>
+        <AmbientGlow color={theme.colors.primary} size={240} top={-40} right={-90} opacity={0.16} />
+        <AmbientGlow color={theme.colors.accent} size={180} top={260} left={-70} opacity={0.1} />
+
+        <View
+          style={[
+            styles.headerCard,
+            { backgroundColor: theme.colors.surfaceAlt, borderColor: theme.colors.borderMuted }
+          ]}
         >
-          Gasto por mês
-        </Text>
-
-        {gastoPorMes.length === 0 ? (
-          <EmptyState icon="bar-chart-outline" message="Ainda sem dados suficientes." />
-        ) : (
-          gastoPorMes.map((g) => (
-            <View key={g.mes} style={{ marginBottom: 14 }}>
-              <View style={styles.barLabelRow}>
-                <Text
-                  style={{
-                    fontFamily: theme.fontFamily.semiBold,
-                    fontSize: theme.type.body.fontSize,
-                    color: theme.colors.text,
-                    textTransform: 'capitalize'
-                  }}
-                >
-                  {monthLabel(g.mes)}
-                </Text>
-                <Text style={{ fontFamily: theme.fontFamily.extraBold, color: theme.colors.text }}>
-                  {formatBRL(g.total)}
-                </Text>
-              </View>
-              <View
-                style={[
-                  styles.barTrack,
-                  {
-                    borderColor: theme.colors.border,
-                    borderWidth: theme.borderWidth.bold,
-                    backgroundColor: theme.colors.borderMuted
-                  }
-                ]}
-              >
-                <View
-                  style={{
-                    width: `${(g.total / maxMes) * 100}%`,
-                    backgroundColor: theme.colors.primary,
-                    height: '100%'
-                  }}
-                />
-              </View>
-            </View>
-          ))
-        )}
-      </Card>
-
-      <Card>
-        <Text
-          style={{
-            fontFamily: theme.fontFamily.extraBold,
-            fontSize: theme.type.title.fontSize,
-            color: theme.colors.text,
-            marginBottom: 16
-          }}
-        >
-          Comparação de supermercados
-        </Text>
-
-        {comparativoMercados.length === 0 ? (
-          <EmptyState icon="storefront-outline" message="Ainda sem dados suficientes." />
-        ) : (
-          comparativoMercados.map((m, index) => (
-            <View
-              key={m.mercadoId}
-              style={[
-                styles.marketRow,
-                index < comparativoMercados.length - 1
-                  ? {
-                      borderBottomColor: theme.colors.borderMuted,
-                      borderBottomWidth: theme.borderWidth.hairline
-                    }
-                  : null
-              ]}
+          <View style={styles.headerTop}>
+            <Ionicons name="sparkles" size={14} color={theme.colors.accent} />
+            <Text
+              style={{
+                fontFamily: theme.fontFamily.bold,
+                fontSize: 11,
+                letterSpacing: 1,
+                textTransform: 'uppercase',
+                color: theme.colors.accent
+              }}
             >
-              <View style={{ flex: 1, gap: 4 }}>
-                <View
-                  style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}
-                >
+              Resumo financeiro
+            </Text>
+          </View>
+          <View style={styles.statsRow}>
+            <View style={styles.statBlock}>
+              <Text
+                style={{
+                  fontFamily: theme.fontFamily.medium,
+                  fontSize: 12,
+                  color: theme.colors.textMuted
+                }}
+              >
+                Total no período
+              </Text>
+              <Text
+                style={{
+                  fontFamily: theme.fontFamily.extraBold,
+                  fontSize: theme.type.headline.fontSize,
+                  color: theme.colors.primary
+                }}
+              >
+                {formatBRL(totalPeriodo)}
+              </Text>
+              <Text
+                style={{
+                  fontFamily: theme.fontFamily.medium,
+                  fontSize: 11,
+                  color: theme.colors.textFaint
+                }}
+              >
+                {gastoPorMes.length} {gastoPorMes.length === 1 ? 'mês mapeado' : 'meses mapeados'}
+              </Text>
+            </View>
+            <View style={styles.statBlock}>
+              <Text
+                style={{
+                  fontFamily: theme.fontFamily.medium,
+                  fontSize: 12,
+                  color: theme.colors.textMuted
+                }}
+              >
+                Média mensal
+              </Text>
+              <Text
+                style={{
+                  fontFamily: theme.fontFamily.extraBold,
+                  fontSize: theme.type.headline.fontSize,
+                  color: theme.colors.text
+                }}
+              >
+                {formatBRL(mediaMensal)}
+              </Text>
+              {variacao != null ? (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
+                  <Ionicons
+                    name={variacao <= 0 ? 'trending-down' : 'trending-up'}
+                    size={12}
+                    color={theme.colors.accent}
+                  />
                   <Text
                     style={{
-                      fontFamily: theme.fontFamily.extraBold,
-                      fontSize: theme.type.body.fontSize,
-                      color: theme.colors.text
+                      fontFamily: theme.fontFamily.semiBold,
+                      fontSize: 11,
+                      color: theme.colors.accent
                     }}
                   >
-                    {m.mercadoNome}
+                    {variacao <= 0 ? '' : '+'}
+                    {variacao.toFixed(1)}% vs mês anterior
                   </Text>
-                  {index === 0 && comparativoMercados.length > 1 ? (
-                    <Badge label="Mais econômico" icon="pricetag-outline" />
-                  ) : null}
+                </View>
+              ) : null}
+            </View>
+          </View>
+        </View>
+
+        <Card>
+          <View style={styles.cardHeaderRow}>
+            <View style={[styles.cardIcon, { backgroundColor: theme.colors.background }]}>
+              <Ionicons name="bar-chart" size={18} color={theme.colors.primary} />
+            </View>
+            <View>
+              <Text
+                style={{
+                  fontFamily: theme.fontFamily.bold,
+                  fontSize: theme.type.bodyLg.fontSize,
+                  color: theme.colors.text
+                }}
+              >
+                Gasto por mês
+              </Text>
+              <Text
+                style={{
+                  fontFamily: theme.fontFamily.medium,
+                  fontSize: 11,
+                  color: theme.colors.textMuted
+                }}
+              >
+                Toque numa barra para ver o valor
+              </Text>
+            </View>
+          </View>
+
+          {gastoPorMes.length === 0 ? (
+            <EmptyState icon="bar-chart-outline" message="Ainda sem dados suficientes." />
+          ) : (
+            <>
+              <View style={styles.chartArea}>
+                <Svg
+                  style={StyleSheet.absoluteFill}
+                  viewBox={`0 0 ${gastoPorMes.length * 48} ${CHART_HEIGHT}`}
+                  preserveAspectRatio="none"
+                >
+                  <Polyline
+                    points={gastoPorMes
+                      .map((g, i) => {
+                        const x = i * 48 + 24;
+                        const y = CHART_HEIGHT - (g.total / maxMes) * (CHART_HEIGHT - 10) - 4;
+                        return `${x},${y}`;
+                      })
+                      .join(' ')}
+                    fill="none"
+                    stroke={theme.colors.accent}
+                    strokeWidth={2}
+                    strokeDasharray="4 4"
+                    opacity={0.7}
+                  />
+                </Svg>
+                <View style={styles.barsRow}>
+                  {gastoPorMes.map((g) => {
+                    const alturaPct = Math.max(6, (g.total / maxMes) * 100);
+                    const selecionado = mesSelecionado === g.mes;
+                    return (
+                      <Pressable
+                        key={g.mes}
+                        style={styles.barColumn}
+                        onPress={() => setMesSelecionado(selecionado ? null : g.mes)}
+                      >
+                        {selecionado ? (
+                          <View
+                            style={[
+                              styles.tooltip,
+                              {
+                                backgroundColor: theme.colors.surfaceAlt,
+                                borderColor: theme.colors.border
+                              }
+                            ]}
+                          >
+                            <Text
+                              style={{
+                                fontFamily: theme.fontFamily.bold,
+                                fontSize: 10,
+                                color: theme.colors.primary
+                              }}
+                            >
+                              {formatBRL(g.total)}
+                            </Text>
+                          </View>
+                        ) : null}
+                        <LinearGradient
+                          colors={[theme.colors.primary, theme.colors.accent]}
+                          start={{ x: 0, y: 1 }}
+                          end={{ x: 0, y: 0 }}
+                          style={[styles.bar, { height: `${alturaPct}%` }]}
+                        />
+                        <Text
+                          numberOfLines={1}
+                          style={{
+                            fontFamily: theme.fontFamily.semiBold,
+                            fontSize: 10,
+                            marginTop: 6,
+                            color: theme.colors.textMuted,
+                            textTransform: 'capitalize'
+                          }}
+                        >
+                          {monthLabel(g.mes).split(' de ')[0]?.slice(0, 3)}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
                 </View>
               </View>
-              <View style={{ alignItems: 'flex-end' }}>
-                <Text style={{ fontFamily: theme.fontFamily.extraBold, color: theme.colors.text }}>
-                  {formatBRL(m.mediaPorCompra)}
-                </Text>
+            </>
+          )}
+        </Card>
+
+        <Card>
+          <View style={styles.cardHeaderRow}>
+            <View style={[styles.cardIcon, { backgroundColor: theme.colors.background }]}>
+              <Ionicons name="storefront" size={18} color={theme.colors.primary} />
+            </View>
+            <Text
+              style={{
+                fontFamily: theme.fontFamily.bold,
+                fontSize: theme.type.bodyLg.fontSize,
+                color: theme.colors.text
+              }}
+            >
+              Comparação de supermercados
+            </Text>
+          </View>
+
+          {comparativoMercados.length === 0 ? (
+            <EmptyState icon="storefront-outline" message="Ainda sem dados suficientes." />
+          ) : (
+            comparativoMercados.map((m, index) => (
+              <View key={m.mercadoId} style={styles.marketBlock}>
+                <View style={styles.marketTopRow}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+                    <Text
+                      style={{ fontFamily: theme.fontFamily.extraBold, color: theme.colors.text }}
+                    >
+                      {m.mercadoNome}
+                    </Text>
+                    {index === 0 && comparativoMercados.length > 1 ? (
+                      <Badge label="Mais econômico" icon="pricetag-outline" />
+                    ) : null}
+                  </View>
+                  <Text
+                    style={{ fontFamily: theme.fontFamily.extraBold, color: theme.colors.primary }}
+                  >
+                    {formatBRL(m.mediaPorCompra)}
+                  </Text>
+                </View>
+                <View style={[styles.progressTrack, { backgroundColor: theme.colors.background }]}>
+                  <LinearGradient
+                    colors={[theme.colors.accent, theme.colors.primary]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={{
+                      width: `${(m.totalGasto / maxMercado) * 100}%`,
+                      height: '100%',
+                      borderRadius: 999
+                    }}
+                  />
+                </View>
                 <Text
                   style={{
                     fontFamily: theme.fontFamily.medium,
-                    fontSize: theme.type.caption.fontSize,
+                    fontSize: 11,
                     color: theme.colors.textMuted
                   }}
                 >
                   média/compra · {m.quantidadeCompras}{' '}
-                  {m.quantidadeCompras === 1 ? 'compra' : 'compras'}
+                  {m.quantidadeCompras === 1 ? 'compra' : 'compras'} · total{' '}
+                  {formatBRL(m.totalGasto)}
                 </Text>
               </View>
+            ))
+          )}
+
+          <View style={[styles.insightBox, { backgroundColor: theme.colors.background }]}>
+            <Ionicons name="bulb-outline" size={18} color={theme.colors.accent} />
+            <Text
+              style={{
+                flex: 1,
+                fontFamily: theme.fontFamily.medium,
+                fontSize: 12,
+                color: theme.colors.textMuted,
+                lineHeight: 17
+              }}
+            >
+              O "valor médio por compra" ajuda a ver onde o carrinho costuma sair mais barato. Como
+              os itens variam a cada visita, use como indicativo.
+            </Text>
+          </View>
+        </Card>
+
+        <Card>
+          <View style={styles.cardHeaderRow}>
+            <View style={[styles.cardIcon, { backgroundColor: theme.colors.background }]}>
+              <Ionicons name="swap-vertical" size={18} color={theme.colors.primary} />
             </View>
-          ))
-        )}
+            <View>
+              <Text
+                style={{
+                  fontFamily: theme.fontFamily.bold,
+                  fontSize: theme.type.bodyLg.fontSize,
+                  color: theme.colors.text
+                }}
+              >
+                Exportar e importar
+              </Text>
+              <Text
+                style={{
+                  fontFamily: theme.fontFamily.medium,
+                  fontSize: 11,
+                  color: theme.colors.textMuted
+                }}
+              >
+                Guarde, compartilhe ou restaure seus dados
+              </Text>
+            </View>
+          </View>
 
-        <Text
-          style={{
-            fontFamily: theme.fontFamily.medium,
-            fontSize: theme.type.caption.fontSize,
-            color: theme.colors.textMuted,
-            marginTop: 14,
-            lineHeight: 18
-          }}
-        >
-          O "valor médio por compra" ajuda a ver onde o carrinho costuma sair mais barato. Como os
-          itens variam a cada visita, use como indicativo, não comparação exata de preço por
-          produto.
-        </Text>
-      </Card>
-
-      <Card>
-        <Text
-          style={{
-            fontFamily: theme.fontFamily.extraBold,
-            fontSize: theme.type.title.fontSize,
-            color: theme.colors.text,
-            marginBottom: 6
-          }}
-        >
-          Exportar e importar dados
-        </Text>
-        <Text
-          style={{
-            fontFamily: theme.fontFamily.medium,
-            fontSize: theme.type.caption.fontSize,
-            color: theme.colors.textMuted,
-            marginBottom: 16,
-            lineHeight: 18
-          }}
-        >
-          Gere um arquivo com todo o histórico de compras para guardar, compartilhar ou abrir em
-          outro dispositivo.
-        </Text>
-
-        <View style={styles.exportRow}>
-          <View style={styles.exportButton}>
-            <Button
+          <View style={styles.exportRow}>
+            <ExportButton
+              icon="code-slash-outline"
               label="JSON"
-              variant="secondary"
+              sub="Estruturado"
               loading={operacaoEmAndamento === 'json'}
               disabled={compras.length === 0}
               onPress={() => rodar('json', () => exportarJson(compras, catalogo))}
             />
-          </View>
-          <View style={styles.exportButton}>
-            <Button
+            <ExportButton
+              icon="grid-outline"
               label="CSV"
-              variant="secondary"
+              sub="Planilhas"
               loading={operacaoEmAndamento === 'csv'}
               disabled={compras.length === 0}
               onPress={() => rodar('csv', () => exportarCsv(compras))}
             />
-          </View>
-          <View style={styles.exportButton}>
-            <Button
+            <ExportButton
+              icon="document-text-outline"
               label="PDF"
-              variant="secondary"
+              sub="Relatório"
               loading={operacaoEmAndamento === 'pdf'}
               disabled={compras.length === 0}
               onPress={() => rodar('pdf', () => exportarPdf(compras))}
             />
           </View>
-        </View>
 
-        {compras.length === 0 ? (
-          <Text
-            style={{
-              fontFamily: theme.fontFamily.medium,
-              fontSize: theme.type.caption.fontSize,
-              color: theme.colors.textFaint,
-              marginTop: 6
-            }}
-          >
-            Registre ao menos uma compra para poder exportar.
-          </Text>
-        ) : null}
+          {compras.length === 0 ? (
+            <Text
+              style={{
+                fontFamily: theme.fontFamily.medium,
+                fontSize: 12,
+                color: theme.colors.textFaint,
+                marginTop: 6
+              }}
+            >
+              Registre ao menos uma compra para poder exportar.
+            </Text>
+          ) : null}
 
-        <View style={{ marginTop: 14 }}>
-          <Button
-            label="Importar backup (JSON)"
-            variant="ghost"
-            loading={operacaoEmAndamento === 'importar'}
+          <Pressable
             onPress={handleImportar}
-          />
-        </View>
-        <Text
-          style={{
-            fontFamily: theme.fontFamily.medium,
-            fontSize: theme.type.caption.fontSize,
-            color: theme.colors.textFaint,
-            marginTop: 4,
-            lineHeight: 16
-          }}
-        >
-          A importação adiciona os dados do arquivo aos que já existem — não substitui nem apaga
-          nada.
-        </Text>
-      </Card>
+            style={[
+              styles.importZone,
+              { backgroundColor: theme.colors.background, borderColor: theme.colors.borderMuted }
+            ]}
+          >
+            <View style={[styles.importIcon, { backgroundColor: theme.colors.surfaceAlt }]}>
+              <Ionicons
+                name={
+                  operacaoEmAndamento === 'importar' ? 'hourglass-outline' : 'cloud-upload-outline'
+                }
+                size={22}
+                color={theme.colors.primary}
+              />
+            </View>
+            <Text
+              style={{ fontFamily: theme.fontFamily.bold, fontSize: 13, color: theme.colors.text }}
+            >
+              Toque para importar um backup (.json)
+            </Text>
+          </Pressable>
+          <View style={[styles.safetyPill, { backgroundColor: theme.colors.background }]}>
+            <Ionicons name="shield-checkmark-outline" size={14} color={theme.colors.accent} />
+            <Text
+              style={{
+                fontFamily: theme.fontFamily.medium,
+                fontSize: 11,
+                color: theme.colors.textMuted,
+                flex: 1
+              }}
+            >
+              A importação adiciona os dados sem apagar compras existentes.
+            </Text>
+          </View>
+        </Card>
+      </ScrollView>
 
-      <ConfirmModal
-        visible={mensagem != null}
-        message={mensagem ?? ''}
-        onDismiss={() => setMensagem(null)}
+      <Toast message={toastMsg} onHide={() => setToastMsg(null)} />
+    </View>
+  );
+}
+
+function ExportButton({
+  icon,
+  label,
+  sub,
+  onPress,
+  loading,
+  disabled
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  sub: string;
+  onPress: () => void;
+  loading?: boolean;
+  disabled?: boolean;
+}) {
+  const scheme = useColorScheme();
+  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled || loading}
+      style={[
+        styles.exportButton,
+        {
+          backgroundColor: theme.colors.background,
+          opacity: disabled ? 0.4 : 1
+        }
+      ]}
+    >
+      <Ionicons
+        name={loading ? 'hourglass-outline' : icon}
+        size={20}
+        color={theme.colors.primary}
       />
-    </ScrollView>
+      <Text
+        style={{ fontFamily: theme.fontFamily.extraBold, fontSize: 13, color: theme.colors.text }}
+      >
+        {label}
+      </Text>
+      <Text
+        style={{ fontFamily: theme.fontFamily.medium, fontSize: 10, color: theme.colors.textMuted }}
+      >
+        {sub}
+      </Text>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  barLabelRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
-  barTrack: { height: 14, borderRadius: 6, overflow: 'hidden' },
-  marketRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  headerCard: { borderRadius: 18, borderWidth: 1, padding: 16, marginBottom: 16 },
+  headerTop: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
+  statsRow: { flexDirection: 'row', gap: 12 },
+  statBlock: { flex: 1, gap: 2 },
+  cardHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 16 },
+  cardIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
     alignItems: 'center',
-    paddingVertical: 12
+    justifyContent: 'center'
   },
+  chartArea: { height: CHART_HEIGHT + 24 },
+  barsRow: { flexDirection: 'row', height: CHART_HEIGHT, alignItems: 'flex-end' },
+  barColumn: { flex: 1, alignItems: 'center', justifyContent: 'flex-end', height: '100%' },
+  bar: { width: 18, borderRadius: 6 },
+  tooltip: {
+    position: 'absolute',
+    top: -22,
+    borderRadius: 6,
+    borderWidth: 1,
+    paddingHorizontal: 6,
+    paddingVertical: 2
+  },
+  marketBlock: { marginBottom: 16, gap: 6 },
+  marketTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  progressTrack: { height: 8, borderRadius: 999, overflow: 'hidden' },
+  insightBox: { flexDirection: 'row', gap: 10, padding: 12, borderRadius: 12, marginTop: 4 },
   exportRow: { flexDirection: 'row', gap: 8 },
-  exportButton: { flex: 1 }
+  exportButton: { flex: 1, alignItems: 'center', gap: 4, paddingVertical: 14, borderRadius: 14 },
+  importZone: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    marginTop: 16
+  },
+  importIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  safetyPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    padding: 10,
+    borderRadius: 10,
+    marginTop: 10
+  }
 });

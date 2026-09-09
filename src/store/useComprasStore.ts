@@ -7,6 +7,7 @@ import {
   excluirCompra as excluirCompraDb,
   getComparativoMercados,
   getGastoPorMes,
+  getPrecoMedioPorItem,
   listCatalogo,
   listComprasComItens,
   listMercadosNomes,
@@ -19,7 +20,8 @@ import type {
   ComparativoMercado,
   CompraComItens,
   GastoPorMes,
-  NovaCompraInput
+  NovaCompraInput,
+  PrecoMedioItem
 } from '@/types';
 
 interface ComprasState {
@@ -27,6 +29,7 @@ interface ComprasState {
   inicializado: boolean;
   compras: CompraComItens[];
   catalogo: CatalogoItem[];
+  precoMedioPorItem: Record<string, PrecoMedioItem>;
   mercadosSugeridos: string[];
   mesesDisponiveis: string[];
   gastoPorMes: GastoPorMes[];
@@ -43,8 +46,8 @@ interface ComprasState {
   cancelarEdicao: () => void;
   setFiltroMes: (mes: string | null) => void;
   setFiltroMercado: (mercado: string | null) => void;
-  adicionarItemCatalogo: (nome: string) => Promise<void>;
-  renomearItemCatalogo: (id: number, novoNome: string) => Promise<void>;
+  adicionarItemCatalogo: (nome: string, categoria?: string) => Promise<void>;
+  renomearItemCatalogo: (id: number, novoNome: string, categoria?: string) => Promise<void>;
   removerItemCatalogo: (id: number) => Promise<void>;
 }
 
@@ -53,6 +56,7 @@ export const useComprasStore = create<ComprasState>((set, get) => ({
   inicializado: false,
   compras: [],
   catalogo: [],
+  precoMedioPorItem: {},
   mercadosSugeridos: [],
   mesesDisponiveis: [],
   gastoPorMes: [],
@@ -74,6 +78,7 @@ export const useComprasStore = create<ComprasState>((set, get) => ({
       const [
         compras,
         catalogo,
+        precoMedioPorItem,
         mercadosSugeridos,
         mesesDisponiveis,
         gastoPorMes,
@@ -81,6 +86,7 @@ export const useComprasStore = create<ComprasState>((set, get) => ({
       ] = await Promise.all([
         listComprasComItens({ mes: filtroMes, mercadoNome: filtroMercado }),
         listCatalogo(),
+        getPrecoMedioPorItem(),
         listMercadosNomes(),
         listMesesComCompras(),
         getGastoPorMes(),
@@ -89,6 +95,7 @@ export const useComprasStore = create<ComprasState>((set, get) => ({
       set({
         compras,
         catalogo,
+        precoMedioPorItem,
         mercadosSugeridos,
         mesesDisponiveis,
         gastoPorMes,
@@ -127,12 +134,12 @@ export const useComprasStore = create<ComprasState>((set, get) => ({
     void get().refreshTudo();
   },
 
-  adicionarItemCatalogo: async (nome: string) => {
-    await addCatalogoItem(nome);
+  adicionarItemCatalogo: async (nome: string, categoria?: string) => {
+    await addCatalogoItem(nome, categoria);
     await get().refreshTudo();
   },
-  renomearItemCatalogo: async (id: number, novoNome: string) => {
-    await renameCatalogoItem(id, novoNome);
+  renomearItemCatalogo: async (id: number, novoNome: string, categoria?: string) => {
+    await renameCatalogoItem(id, novoNome, categoria);
     await get().refreshTudo();
   },
   removerItemCatalogo: async (id: number) => {

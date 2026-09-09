@@ -1,6 +1,6 @@
 import * as SQLite from 'expo-sqlite';
 
-import { CATALOGO_INICIAL, DATABASE_NAME } from '@/constants';
+import { CATALOGO_INICIAL, CATEGORIA_PADRAO, DATABASE_NAME } from '@/constants';
 
 let dbInstance: SQLite.SQLiteDatabase | null = null;
 
@@ -32,13 +32,30 @@ CREATE TABLE IF NOT EXISTS itens_compra (
 
 CREATE TABLE IF NOT EXISTS catalogo_itens (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  nome TEXT NOT NULL UNIQUE
+  nome TEXT NOT NULL UNIQUE,
+  categoria TEXT NOT NULL DEFAULT 'Outros'
 );
 
 CREATE INDEX IF NOT EXISTS idx_compras_mes ON compras(mes);
 CREATE INDEX IF NOT EXISTS idx_compras_mercado ON compras(mercado_id);
 CREATE INDEX IF NOT EXISTS idx_itens_compra ON itens_compra(compra_id);
+CREATE INDEX IF NOT EXISTS idx_itens_compra_nome ON itens_compra(nome);
 `;
+
+/**
+ * Migrations idempotentes para bancos criados antes de uma coluna existir.
+ * `CREATE TABLE IF NOT EXISTS` não adiciona colunas novas a uma tabela já
+ * existente, então checamos via PRAGMA table_info antes de rodar ALTER TABLE.
+ */
+async function migrarColunasNovas(db: SQLite.SQLiteDatabase): Promise<void> {
+  const colunas = await db.getAllAsync<{ name: string }>('PRAGMA table_info(catalogo_itens)');
+  const temCategoria = colunas.some((c) => c.name === 'categoria');
+  if (!temCategoria) {
+    await db.execAsync(
+      `ALTER TABLE catalogo_itens ADD COLUMN categoria TEXT NOT NULL DEFAULT '${CATEGORIA_PADRAO}'`
+    );
+  }
+}
 
 async function seedCatalogoInicial(db: SQLite.SQLiteDatabase): Promise<void> {
   const row = await db.getFirstAsync<{ total: number }>(
@@ -46,8 +63,11 @@ async function seedCatalogoInicial(db: SQLite.SQLiteDatabase): Promise<void> {
   );
   if (row && row.total > 0) return;
 
-  for (const nome of CATALOGO_INICIAL) {
-    await db.runAsync('INSERT OR IGNORE INTO catalogo_itens (nome) VALUES (?)', [nome]);
+  for (const { nome, categoria } of CATALOGO_INICIAL) {
+    await db.runAsync('INSERT OR IGNORE INTO catalogo_itens (nome, categoria) VALUES (?, ?)', [
+      nome,
+      categoria
+    ]);
   }
 }
 
@@ -60,6 +80,7 @@ export async function getDb(): Promise<SQLite.SQLiteDatabase> {
 
   const db = await SQLite.openDatabaseAsync(DATABASE_NAME);
   await db.execAsync(SCHEMA_SQL);
+  await migrarColunasNovas(db);
   await seedCatalogoInicial(db);
 
   dbInstance = db;
