@@ -8,25 +8,24 @@ module.exports = function (api) {
         {
           root: ['./'],
           alias: {
-            '@': './src',
-            '@/components': './src/components',
-            '@/screens': './src/screens',
-            '@/hooks': './src/hooks',
-            '@/store': './src/store',
+            '@/components': './src/ui/components',
+            '@/screens': './src/ui/screens',
+            '@/theme': './src/ui/theme',
+            '@/storage': './src/data/storage',
+            '@/store': './src/data/store',
+            '@/types': './src/data/types',
+            '@/constants': './src/shared/constants',
+            '@/utils': './src/shared/utils',
             '@/services': './src/services',
-            '@/storage': './src/storage',
-            '@/utils': './src/utils',
-            '@/types': './src/types',
-            '@/constants': './src/constants',
-            '@/theme': './src/theme',
-            '@/navigation': './src/navigation',
-            '@/features': './src/features'
+            '@': './src'
           },
           extensions: ['.ios.ts', '.android.ts', '.ts', '.ios.tsx', '.android.tsx', '.tsx', '.jsx', '.js', '.json']
         }
       ],
-      // Reanimated plugin deve ser sempre o último da lista
-      'react-native-reanimated/plugin'
+      // Deve ser sempre o último da lista.
+      // No Reanimated 4 o plugin de worklets passou a viver em um pacote
+      // próprio, `react-native-reanimated/plugin` virou só um reexport dele.
+      'react-native-worklets/plugin'
     ]
   };
 };

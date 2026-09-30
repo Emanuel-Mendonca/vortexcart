@@ -1,7 +1,7 @@
 ---
 name: "\U0001F41B Bug report"
 about: Reportar um comportamento inesperado ou quebrado
-title: "[Bug] "
+title: '[Bug] '
 labels: bug
 assignees: ''
 ---

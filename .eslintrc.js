@@ -28,5 +28,14 @@ module.exports = {
       }
     ]
   },
-  ignorePatterns: ['dist/', 'node_modules/', '.expo/', 'babel.config.js', 'metro.config.js']
+  ignorePatterns: [
+    'dist/',
+    'node_modules/',
+    '.expo/',
+    'babel.config.js',
+    'metro.config.js',
+    // Gerado pelo Expo a cada `expo start` e já ignorado no Git, o próprio
+    // arquivo diz que não deve ser editado, então não faz sentido lintá-lo.
+    'expo-env.d.ts'
+  ]
 };

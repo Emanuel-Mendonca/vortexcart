@@ -51,7 +51,7 @@ jobs:
             Veja o [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)
             para o detalhamento completo desta versão.
 
-  # Job de build via EAS — desabilitado até o projeto ter um `eas.json` e um
+  # Job de build via EAS, desabilitado até o projeto ter um `eas.json` e um
   # EXPO_TOKEN configurado em Settings > Secrets. Descomente quando estiver
   # pronto para gerar builds automáticas a cada release.
   #

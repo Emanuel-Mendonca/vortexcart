@@ -1,0 +1,541 @@
+/* ===================================================================
+   Vortex Cart, landing page (docs/index.html)
+   -------------------------------------------------------------------
+   Paleta e tipografia espelham src/theme/tokens.ts (tema escuro).
+   Se um token mudar lá, atualize aqui também, ver BRANDING.md.
+
+   Sumário
+     1. Tokens e base
+     2. Utilitários (wrap, ícones, glows)
+     3. Header e navegação
+     4. Hero (badge, CTA, moldura orbital)
+     5. Seções genéricas (eyebrow, título, subtítulo)
+     6. Funcionalidades
+     7. Telas do app
+     8. Citação
+     9. Card de nota / origem
+    10. Footer
+    11. Responsivo
+   =================================================================== */
+
+/* -------------------------------------------------------------------
+   1. Tokens e base
+   ------------------------------------------------------------------- */
+:root {
+  --lavender: #ccbff7;
+  --lavender-deep: #625788;
+  --gold: #d3c87c;
+  --night: #10131b;
+  --surface: #1d1f28;
+  --surface-high: #272a32;
+  --on-surface: #e1e2ee;
+  --on-surface-muted: rgba(225, 226, 238, 0.65);
+  --on-surface-faint: rgba(225, 226, 238, 0.42);
+  --outline: #48454e;
+  --white: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Raleway', sans-serif;
+  background: var(--night);
+  color: var(--on-surface);
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* -------------------------------------------------------------------
+   2. Utilitários
+   ------------------------------------------------------------------- */
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  display: inline-block;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  vertical-align: middle;
+}
+
+/* Tamanho de ícone que antes ia no atributo style= de cada <span>. */
+.icon-inline {
+  font-size: 18px;
+}
+
+/* Glows atmosféricos de fundo, mesma ideia do componente AmbientGlow do
+   app. Posição e cor de cada um ficam nos modificadores .glow--1/2/3. */
+.glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glow--1 {
+  width: 420px;
+  height: 420px;
+  background: rgba(98, 87, 136, 0.55);
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.glow--2 {
+  width: 280px;
+  height: 280px;
+  background: rgba(204, 191, 247, 0.18);
+  top: 340px;
+  left: -100px;
+}
+
+.glow--3 {
+  width: 320px;
+  height: 320px;
+  background: rgba(211, 200, 124, 0.1);
+  top: 600px;
+  right: -100px;
+}
+
+/* -------------------------------------------------------------------
+   3. Header e navegação
+   ------------------------------------------------------------------- */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(16, 19, 27, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+header .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand img {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+.brand span {
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.brand b {
+  color: var(--lavender);
+}
+
+nav a {
+  color: var(--on-surface-muted);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.88rem;
+  margin-left: 28px;
+  transition: color 0.15s;
+}
+
+nav a:hover {
+  color: var(--lavender);
+}
+
+/* -------------------------------------------------------------------
+   4. Hero
+   ------------------------------------------------------------------- */
+.hero {
+  position: relative;
+  padding: 90px 0 70px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.hero h1 {
+  font-size: 2.7rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  max-width: 620px;
+  margin: 0 auto 18px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero h1 span {
+  color: var(--lavender);
+}
+
+.hero p {
+  font-size: 1.1rem;
+  color: var(--on-surface-muted);
+  max-width: 480px;
+  margin: 0 auto 36px;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: rgba(204, 191, 247, 0.12);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(204, 191, 247, 0.25);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lavender);
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 1;
+}
+
+.badge .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.cta-row {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 16px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  text-decoration: none;
+  transition:
+    transform 0.15s,
+    opacity 0.15s;
+}
+
+.btn:hover {
+  transform: scale(1.03);
+}
+
+.btn-primary {
+  background: var(--on-surface);
+  color: var(--lavender-deep);
+  box-shadow: 0 0 28px rgba(225, 226, 238, 0.35);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--on-surface);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(10px);
+}
+
+/* Moldura do celular com os anéis orbitais girando, representação direta
+   do símbolo da marca (ver BRANDING.md). */
+.orbit-frame {
+  position: relative;
+  max-width: 300px;
+  margin: 56px auto 0;
+  aspect-ratio: 9 / 17.5;
+}
+
+.orbit-frame svg {
+  position: absolute;
+  inset: -40px;
+  width: calc(100% + 80px);
+  height: calc(100% + 80px);
+  animation: spin 50s linear infinite;
+  opacity: 0.45;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.device {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 32px;
+  background: rgba(39, 42, 50, 0.55);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 30px 60px -12px rgba(98, 87, 136, 0.55),
+    inset 0 1px 1px rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.device img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 31px;
+}
+
+/* -------------------------------------------------------------------
+   5. Seções genéricas
+   ------------------------------------------------------------------- */
+section {
+  padding: 76px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--lavender);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+h2 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  color: var(--on-surface-muted);
+  max-width: 520px;
+  line-height: 1.6;
+  margin: 0 0 44px;
+}
+
+/* -------------------------------------------------------------------
+   6. Funcionalidades
+   ------------------------------------------------------------------- */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.feature {
+  padding: 26px;
+  border-radius: 20px;
+  background: rgba(39, 42, 50, 0.5);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 32px -12px rgba(98, 87, 136, 0.3);
+  text-align: center;
+}
+
+.feature .icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(204, 191, 247, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  margin: 0 auto 16px;
+}
+
+.feature h3 {
+  margin: 0 0 8px;
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.feature p {
+  margin: 0;
+  color: var(--on-surface-muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+/* -------------------------------------------------------------------
+   7. Telas do app
+   ------------------------------------------------------------------- */
+.screens-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 26px;
+}
+
+.screen-card {
+  text-align: center;
+}
+
+.screen-card .frame {
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 45px -14px rgba(98, 87, 136, 0.45);
+  background: var(--surface);
+}
+
+.screen-card img {
+  width: 100%;
+  display: block;
+}
+
+.screen-card p {
+  font-weight: 600;
+  margin-top: 16px;
+  font-size: 0.9rem;
+  color: var(--on-surface-muted);
+}
+
+/* -------------------------------------------------------------------
+   8. Citação
+   ------------------------------------------------------------------- */
+.quote-section {
+  text-align: center;
+  position: relative;
+}
+
+.quote-card {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 48px 32px;
+  border-radius: 28px;
+  background: linear-gradient(160deg, rgba(204, 191, 247, 0.14), rgba(39, 42, 50, 0.4));
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.quote-card blockquote {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 14px;
+  color: var(--on-surface);
+  letter-spacing: -0.01em;
+}
+
+.quote-card p {
+  color: var(--on-surface-muted);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* -------------------------------------------------------------------
+   9. Card de nota / origem
+   ------------------------------------------------------------------- */
+.note-card {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 34px;
+  border-radius: 20px;
+  background: rgba(211, 200, 124, 0.08);
+  border: 1px solid rgba(211, 200, 124, 0.25);
+  text-align: center;
+}
+
+.note-card h3 {
+  color: var(--gold);
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+}
+
+.note-card p {
+  color: var(--on-surface-muted);
+  line-height: 1.65;
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.note-card a {
+  color: var(--gold);
+}
+
+/* -------------------------------------------------------------------
+   10. Footer
+   ------------------------------------------------------------------- */
+footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 40px 0;
+  text-align: center;
+}
+
+footer p {
+  color: var(--on-surface-faint);
+  font-size: 0.85rem;
+  margin: 6px 0;
+}
+
+footer a {
+  color: var(--lavender);
+  text-decoration: none;
+}
+
+/* -------------------------------------------------------------------
+   11. Responsivo
+   ------------------------------------------------------------------- */
+@media (max-width: 600px) {
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  nav {
+    display: none;
+  }
+}

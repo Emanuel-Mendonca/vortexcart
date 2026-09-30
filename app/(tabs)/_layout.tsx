@@ -1,12 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { useColorScheme } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getTheme } from '@/theme';
 
 export default function TabsLayout() {
   const scheme = useColorScheme();
   const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  // Com o app desenhando de ponta a ponta (Android 15+), a barra de abas fica
+  // por baixo da barra de navegação do sistema sem esta reserva de espaço.
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -17,7 +21,9 @@ export default function TabsLayout() {
         tabBarStyle: {
           backgroundColor: theme.colors.surface,
           borderTopColor: theme.colors.border,
-          borderTopWidth: theme.borderWidth.bold
+          borderTopWidth: theme.borderWidth.bold,
+          height: 58 + insets.bottom,
+          paddingBottom: insets.bottom
         },
         tabBarLabelStyle: { fontFamily: theme.fontFamily.bold, fontSize: 11 }
       }}
@@ -28,6 +34,15 @@ export default function TabsLayout() {
           title: 'Nova Compra',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="cart-outline" size={size} color={color} />
+          )
+        }}
+      />
+      <Tabs.Screen
+        name="cupom"
+        options={{
+          title: 'Cupom',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="qr-code-outline" size={size} color={color} />
           )
         }}
       />

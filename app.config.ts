@@ -8,13 +8,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   owner: undefined,
   version: '0.1.0',
   orientation: 'portrait',
-  icon: './src/assets/icon.png',
+  icon: './src/ui/assets/icon.png',
   userInterfaceStyle: 'automatic',
-  splash: {
-    image: './src/assets/splash.png',
-    resizeMode: 'contain',
-    backgroundColor: '#000000'
-  },
+  // A chave `splash` de topo saiu do ExpoConfig no SDK 57, a splash agora é
+  // configurada exclusivamente pelo plugin `expo-splash-screen`, mais abaixo.
   assetBundlePatterns: ['**/*'],
   ios: {
     supportsTablet: true,
@@ -22,23 +19,35 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   android: {
     adaptiveIcon: {
-      foregroundImage: './src/assets/adaptive-icon.png',
+      foregroundImage: './src/ui/assets/adaptive-icon.png',
       backgroundColor: '#000000'
     },
     package: 'com.vortexcart.app'
   },
   web: {
-    favicon: './src/assets/favicon.png',
+    favicon: './src/ui/assets/favicon.png',
     bundler: 'metro'
   },
   plugins: [
     'expo-router',
-    'expo-secure-store',
+    // A partir do SDK 57 estes módulos precisam ser declarados explicitamente
+    // como plugins (antes eram resolvidos por autolinking sem entrada aqui).
+    'expo-font',
+    [
+      'expo-camera',
+      {
+        cameraPermission:
+          'O Vortex Cart usa a câmera para ler o QR Code do cupom fiscal e preencher a compra automaticamente.'
+      }
+    ],
+    'expo-sharing',
+    'expo-sqlite',
+    'expo-status-bar',
     [
       'expo-splash-screen',
       {
         backgroundColor: '#000000',
-        image: './src/assets/splash.png',
+        image: './src/ui/assets/splash.png',
         imageWidth: 200
       }
     ]
