@@ -10,9 +10,9 @@ problemas na exportação/importação de arquivos, etc.).
 
 ## Versões suportadas
 
-| Versão | Suportada |
-|---|---|
-| 0.x (atual) | ✅ |
+| Versão      | Suportada |
+| ----------- | --------- |
+| 0.x (atual) | ✅        |
 
 Enquanto o projeto estiver em `0.x` (pré-1.0), apenas a versão mais recente recebe correções
 de segurança.

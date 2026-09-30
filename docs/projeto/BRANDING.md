@@ -39,7 +39,7 @@ redor do mockup do app na landing page é a representação direta do próprio s
 
 Paleta derivada de um esquema Material Design 3 (tema escuro completo), com o tema claro
 obtido a partir dos tokens `inverse-*`/`*-fixed*` do próprio M3 — não são cores soltas
-inventadas à parte, e estão centralizadas em `src/theme/tokens.ts`.
+inventadas à parte, e estão centralizadas em `src/ui/theme/tokens.ts`.
 
 | Token                    | Uso                                 | Escuro (padrão)                          | Claro                                |
 | ------------------------ | ----------------------------------- | ---------------------------------------- | ------------------------------------ |
@@ -56,19 +56,19 @@ sistema, mas a "assinatura" visual da marca vive no escuro.
 
 ## Variações
 
-1. **Ícone do app** (`src/assets/icon.png`): logo oficial (anel aberto + carrinho) em tom
+1. **Ícone do app** (`src/ui/assets/icon.png`): logo oficial (anel aberto + carrinho) em tom
    claro sobre fundo noturno, cantos arredondados — pronto para launcher de celular.
-2. **Ícone adaptativo Android** (`src/assets/adaptive-icon.png`): apenas o símbolo, sem
+2. **Ícone adaptativo Android** (`src/ui/assets/adaptive-icon.png`): apenas o símbolo, sem
    fundo (transparente), extraído da logo oficial para compor com a máscara adaptativa do
    Android.
-3. **Splash screen** (`src/assets/splash.png`): mesmo símbolo, centralizado sobre fundo
+3. **Splash screen** (`src/ui/assets/splash.png`): mesmo símbolo, centralizado sobre fundo
    noturno em formato retrato.
 4. **Monocromático** (favicon, impressão em P&B): a logo já funciona nativamente em uma cor
    só (claro sobre escuro) — é a sua forma padrão, sem necessidade de uma versão separada.
 5. **Wordmark**: "Vortex Cart" em Raleway/Space Grotesk, com "Cart" destacado em lavanda,
    sobre fundo escuro translúcido (ver cabeçalho de `docs/index.html`).
 
-Os arquivos em `src/assets/` foram gerados automaticamente a partir da logo oficial
+Os arquivos em `src/ui/assets/` foram gerados automaticamente a partir da logo oficial
 (recorte, remoção de fundo para a versão adaptativa, e recomposição para o splash) — já é a
 versão definitiva para uso no app, não um placeholder.
 

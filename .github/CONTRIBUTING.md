@@ -10,7 +10,7 @@ Obrigado pelo interesse em contribuir! Este documento explica o fluxo esperado.
 
 ## Ambiente de desenvolvimento
 
-Siga o [IMPLEMENTACAO.md](./IMPLEMENTACAO.md) para instalar dependências e rodar o projeto localmente.
+Siga o [IMPLEMENTACAO.md](../docs/projeto/IMPLEMENTACAO.md) para instalar dependências e rodar o projeto localmente.
 
 ## Fluxo de branches
 
@@ -57,10 +57,10 @@ O `pre-commit` hook já roda lint + format nos arquivos alterados automaticament
 
 Antes de marcar uma funcionalidade como concluída, confira:
 
-- [ ] O código segue os padrões do [STYLEGUIDE.md](./STYLEGUIDE.md)
+- [ ] O código segue os padrões do [STYLEGUIDE.md](../docs/projeto/STYLEGUIDE.md)
 - [ ] Tipos TypeScript sem `any` desnecessário (`npm run typecheck` passa)
 - [ ] ESLint e Prettier sem erros (`npm run lint` e `npm run format:check` passam)
-- [ ] Testes relevantes adicionados/atualizados — veja o [TESTPLAN.md](./TESTPLAN.md)
+- [ ] Testes relevantes adicionados/atualizados — veja o [TESTPLAN.md](../docs/projeto/TESTPLAN.md)
 - [ ] Testado manualmente em pelo menos uma plataforma (Android, iOS ou web)
 - [ ] Nenhuma sensação de "quebra" visual nos temas claro e escuro
 - [ ] Commits seguem Conventional Commits

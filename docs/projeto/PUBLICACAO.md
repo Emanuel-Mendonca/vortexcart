@@ -49,28 +49,28 @@ git commit -m "chore: scaffold inicial do projeto (Expo + TypeScript + ferrament
 ### 3.2 — Identidade visual
 
 ```powershell
-git add src/theme src/constants src/assets BRANDING.md
+git add src/ui/theme src/shared/constants src/ui/assets docs/projeto/BRANDING.md
 git commit -m "feat(branding): design tokens, paleta e identidade visual do Vortex Cart"
 ```
 
 ### 3.3 — Tipos, utilitários e banco de dados
 
 ```powershell
-git add src/types src/utils src/storage
+git add src/data/types src/shared/utils src/data/storage
 git commit -m "feat(storage): tipos de dominio, utilitarios e schema SQLite"
 ```
 
 ### 3.4 — Estado global
 
 ```powershell
-git add src/store
+git add src/data/store
 git commit -m "feat(store): estado global com Zustand"
 ```
 
 ### 3.5 — Interface e navegação
 
 ```powershell
-git add src/components src/screens app
+git add src/ui/components src/ui/screens app
 git commit -m "feat(ui): componentes, telas e navegacao com Expo Router"
 ```
 

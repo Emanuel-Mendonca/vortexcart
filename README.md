@@ -41,16 +41,16 @@ O Vortex Cart nasceu de uma planilha Excel usada para acompanhar os gastos do me
 
 ## Tecnologias
 
-| Camada       | Escolha                                                          | Por quê (resumo — detalhes em [ARCHITECTURE.md](./ARCHITECTURE.md))   |
-| ------------ | ---------------------------------------------------------------- | --------------------------------------------------------------------- |
-| Framework    | React Native + Expo (SDK 51)                                     | Managed workflow, sem necessidade de configuração nativa manual       |
-| Linguagem    | TypeScript (strict)                                              | Segurança de tipos em todo o domínio de dados                         |
-| Navegação    | Expo Router                                                      | Roteamento baseado em arquivos, menos boilerplate                     |
-| Estado       | Zustand                                                          | Simples e suficiente para um app 100% offline (sem cache de servidor) |
-| Persistência | expo-sqlite                                                      | Consultas relacionais (SUM/AVG/GROUP BY) para os relatórios de gasto  |
-| Formulários  | React Hook Form + Zod                                            | Validação tipada e performática                                       |
-| Exportação   | expo-file-system, expo-sharing, expo-print, expo-document-picker | Geração e compartilhamento de JSON/CSV/PDF, e importação de backup    |
-| Qualidade    | ESLint, Prettier, Husky, lint-staged, Commitlint                 | Consistência de código e commits                                      |
+| Camada       | Escolha                                                          | Por quê (resumo — detalhes em [ARCHITECTURE.md](./docs/projeto/ARCHITECTURE.md)) |
+| ------------ | ---------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Framework    | React Native + Expo (SDK 51)                                     | Managed workflow, sem necessidade de configuração nativa manual                  |
+| Linguagem    | TypeScript (strict)                                              | Segurança de tipos em todo o domínio de dados                                    |
+| Navegação    | Expo Router                                                      | Roteamento baseado em arquivos, menos boilerplate                                |
+| Estado       | Zustand                                                          | Simples e suficiente para um app 100% offline (sem cache de servidor)            |
+| Persistência | expo-sqlite                                                      | Consultas relacionais (SUM/AVG/GROUP BY) para os relatórios de gasto             |
+| Formulários  | React Hook Form + Zod                                            | Validação tipada e performática                                                  |
+| Exportação   | expo-file-system, expo-sharing, expo-print, expo-document-picker | Geração e compartilhamento de JSON/CSV/PDF, e importação de backup               |
+| Qualidade    | ESLint, Prettier, Husky, lint-staged, Commitlint                 | Consistência de código e commits                                                 |
 
 ## Instalação
 
@@ -70,44 +70,57 @@ npx expo start
 
 Escaneie o QR code com o Expo Go (Android) ou a câmera (iOS), ou pressione `a`/`i`/`w` no terminal para abrir no emulador Android, simulador iOS, ou navegador.
 
-Guia completo, incluindo Git e GitHub, em [IMPLEMENTACAO.md](./IMPLEMENTACAO.md). Para subir o
+Guia completo, incluindo Git e GitHub, em [IMPLEMENTACAO.md](./docs/projeto/IMPLEMENTACAO.md). Para subir o
 projeto para o GitHub em commits organizados, publicar a landing page e gerar um build
-instalável (sem depender do Expo Go), veja [PUBLICACAO.md](./PUBLICACAO.md).
+instalável (sem depender do Expo Go), veja [PUBLICACAO.md](./docs/projeto/PUBLICACAO.md).
 
 ## Estrutura do projeto
 
 ```
-app/            rotas (Expo Router) — telas montadas a partir de src/screens
+app/              rotas (Expo Router) — cada arquivo só renderiza uma tela
+
 src/
-  assets/       ícone, splash e favicon do app
-  components/   componentes de UI reutilizáveis
-  constants/    catálogo inicial, categorias e nome do banco
-  screens/      as 4 telas do app
-  storage/      camada SQLite (schema + repositórios)
-  services/     exportação/importação de dados
-  store/        estado global (Zustand)
-  theme/        design tokens e tema claro/escuro
-  types/        tipos de domínio
-  utils/        formatação, datas, validação (Zod)
+  ui/             tudo que o usuário vê
+    components/     componentes reutilizáveis (Button, Card, Screen...)
+    screens/        as telas do app
+    theme/          design tokens e tema claro/escuro
+    assets/         ícone, splash e favicon
+
+  data/           estado e persistência
+    storage/        camada SQLite (schema, migrações, repositórios)
+    store/          estado global (Zustand)
+    types/          contratos de dados do domínio
+
+  services/       I/O com o mundo de fora
+    nfce/           leitura do cupom fiscal (QR Code + portal SEFAZ-MG)
+    export/import   backup em JSON, CSV e PDF
+
+  shared/         código puro, sem dependência de UI nem de banco
+    utils/          moeda, datas, texto, totais, validação (Zod)
+    constants/      catálogo inicial, departamentos, nome do banco
+
+docs/
+  projeto/        documentação técnica (arquitetura, roadmap, backlog...)
+  index.html      landing page publicada no GitHub Pages
 ```
 
-Detalhes de arquitetura e decisões técnicas em [ARCHITECTURE.md](./ARCHITECTURE.md).
+Detalhes de arquitetura e decisões técnicas em [ARCHITECTURE.md](./docs/projeto/ARCHITECTURE.md).
 
 ## Identidade de marca
 
-Nome, conceito do símbolo, paleta e variações do logo em [BRANDING.md](./BRANDING.md).
+Nome, conceito do símbolo, paleta e variações do logo em [BRANDING.md](./docs/projeto/BRANDING.md).
 
 ## Roadmap
 
-Veja o plano completo (MVP → V1 → V2 → V3) em [ROADMAP.md](./ROADMAP.md) e o backlog priorizado (MoSCoW) em [BACKLOG.md](./BACKLOG.md).
+Veja o plano completo (MVP → V1 → V2 → V3) em [ROADMAP.md](./docs/projeto/ROADMAP.md) e o backlog priorizado (MoSCoW) em [BACKLOG.md](./docs/projeto/BACKLOG.md).
 
 ## Como contribuir
 
-Contribuições são bem-vindas! Leia o [CONTRIBUTING.md](./CONTRIBUTING.md) para o fluxo de branches, padrão de commits e checklist de qualidade, e o [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) antes de participar.
+Contribuições são bem-vindas! Leia o [CONTRIBUTING.md](./.github/CONTRIBUTING.md) para o fluxo de branches, padrão de commits e checklist de qualidade, e o [CODE_OF_CONDUCT.md](./.github/CODE_OF_CONDUCT.md) antes de participar.
 
 ## Segurança
 
-Para reportar uma vulnerabilidade, siga as instruções em [SECURITY.md](./SECURITY.md) — não abra uma issue pública.
+Para reportar uma vulnerabilidade, siga as instruções em [SECURITY.md](./.github/SECURITY.md) — não abra uma issue pública.
 
 ## Licença
 

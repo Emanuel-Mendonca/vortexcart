@@ -14,7 +14,7 @@
 
 - `strict: true` sempre. Evite `any`; se for realmente necessário, comente o porquê.
 - Prefira `type` para uniões/formas simples, `interface` para formas de objeto que podem ser
-  estendidas (padrão já usado em `src/types/index.ts`).
+  estendidas (padrão já usado em `src/data/types/index.ts`).
 - Funções exportadas de `storage/` e `services/` sempre com tipo de retorno explícito
   (`Promise<X>`) — facilita ver o contrato sem abrir a implementação.
 - Use `import type { X } from '...'` para importar só tipos (o ESLint já avisa via
@@ -22,7 +22,7 @@
 
 ## Componentes React
 
-- Componentes de UI pura (`src/components/`) não acessam a store nem os repositórios —
+- Componentes de UI pura (`src/ui/components/`) não acessam a store nem os repositórios —
   recebem tudo via props.
 - Prefira componentes de função com hooks; sem classes.
 - Um componente por arquivo, nome do arquivo = nome do componente (`Button.tsx` exporta
@@ -43,21 +43,21 @@ Prettier e ESLint já aplicam a maior parte disso automaticamente (`npm run form
 
 ## Nomenclatura de arquivos
 
-| Tipo | Convenção | Exemplo |
-|---|---|---|
-| Componente | PascalCase | `MonthPicker.tsx` |
-| Tela | PascalCase + sufixo `Screen` | `NovaCompraScreen.tsx` |
-| Repositório | camelCase + sufixo `Repository` | `comprasRepository.ts` |
-| Hook customizado | `use` + PascalCase | `useComprasStore.ts` |
-| Utilitário | camelCase | `currency.ts`, `date.ts` |
-| Rota (Expo Router) | minúsculo, reflete a URL | `historico.tsx` |
+| Tipo               | Convenção                       | Exemplo                  |
+| ------------------ | ------------------------------- | ------------------------ |
+| Componente         | PascalCase                      | `MonthPicker.tsx`        |
+| Tela               | PascalCase + sufixo `Screen`    | `NovaCompraScreen.tsx`   |
+| Repositório        | camelCase + sufixo `Repository` | `comprasRepository.ts`   |
+| Hook customizado   | `use` + PascalCase              | `useComprasStore.ts`     |
+| Utilitário         | camelCase                       | `currency.ts`, `date.ts` |
+| Rota (Expo Router) | minúsculo, reflete a URL        | `historico.tsx`          |
 
 ## Commits e branches
 
-Ver [CONTRIBUTING.md](./CONTRIBUTING.md) — Conventional Commits, Git Flow simplificado.
+Ver [CONTRIBUTING.md](../../.github/CONTRIBUTING.md) — Conventional Commits, Git Flow simplificado.
 
 ## Design tokens
 
-Nunca hardcode cor, espaçamento ou fonte em um componente. Tudo vem de `src/theme/tokens.ts`
+Nunca hardcode cor, espaçamento ou fonte em um componente. Tudo vem de `src/ui/theme/tokens.ts`
 via `getTheme(scheme)`. Se um valor que você precisa não existe nos tokens, adicione-o lá
 primeiro — não crie um valor "só desta vez" dentro do componente.

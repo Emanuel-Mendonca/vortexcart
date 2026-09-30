@@ -5,8 +5,8 @@
 O projeto usa **Jest** + **jest-expo** como test runner, e **React Native Testing Library**
 para testes de componentes/telas. A pirâmide de testes priorizada:
 
-1. **Testes unitários** (maior volume) — funções puras: `src/utils/*`, cálculo de totais em
-   `src/storage/comprasRepository.ts`, agregações em `src/storage/resumoRepository.ts`.
+1. **Testes unitários** (maior volume) — funções puras: `src/shared/utils/*`, cálculo de totais em
+   `src/data/storage/comprasRepository.ts`, agregações em `src/data/storage/resumoRepository.ts`.
 2. **Testes de integração** — store Zustand (`useComprasStore`) operando contra um banco
    SQLite real (em memória / arquivo temporário), cobrindo o fluxo completo: criar → listar
    → editar → excluir → agregações refletindo a mudança.
@@ -18,18 +18,18 @@ build de EAS estável (ver [ROADMAP.md](./ROADMAP.md), V1).
 
 ## O que testar prioritariamente
 
-| Área | Por quê é prioridade |
-|---|---|
-| `calcularTotal` / subtotais (quantidade × valor unitário) | Erro aqui é o pior tipo: silencioso e financeiro |
-| `getComparativoMercados` / `getGastoPorMes` | Lógica de agregação SQL é fácil de quebrar em uma migration futura |
-| `novaCompraFormSchema` (Zod) | Garante que dados inválidos nunca cheguem ao banco |
-| `exportPayloadSchema` / importação | Um backup malformado não pode corromper o banco do usuário |
-| `monthLabel` / `parseMonthValue` / `buildMonthValue` | Bug aqui quebra filtros e exibição em cascata |
+| Área                                                      | Por quê é prioridade                                               |
+| --------------------------------------------------------- | ------------------------------------------------------------------ |
+| `calcularTotal` / subtotais (quantidade × valor unitário) | Erro aqui é o pior tipo: silencioso e financeiro                   |
+| `getComparativoMercados` / `getGastoPorMes`               | Lógica de agregação SQL é fácil de quebrar em uma migration futura |
+| `novaCompraFormSchema` (Zod)                              | Garante que dados inválidos nunca cheguem ao banco                 |
+| `exportPayloadSchema` / importação                        | Um backup malformado não pode corromper o banco do usuário         |
+| `monthLabel` / `parseMonthValue` / `buildMonthValue`      | Bug aqui quebra filtros e exibição em cascata                      |
 
 ## Convenções
 
 - Arquivos de teste ao lado do código: `arquivo.ts` → `arquivo.test.ts`.
-- Testes de banco usam `resetDbInstanceForTests()` (`src/storage/db.ts`) no `beforeEach` para
+- Testes de banco usam `resetDbInstanceForTests()` (`src/data/storage/db.ts`) no `beforeEach` para
   isolar cada caso.
 - Sem mocks do `expo-sqlite` em si — testamos contra o banco real (mais lento, porém mais
   confiável para uma camada de persistência).
@@ -56,4 +56,4 @@ Antes de considerar qualquer funcionalidade "pronta", confirme:
       se a mudança afeta a estrutura)
 
 Esta checklist complementa (não substitui) a checklist de Pull Request do
-[CONTRIBUTING.md](./CONTRIBUTING.md).
+[CONTRIBUTING.md](../../.github/CONTRIBUTING.md).
