@@ -10,6 +10,9 @@ export const exportedItemSchema = z.object({
 export const exportedCompraSchema = z.object({
   mes: z.string().min(1),
   mercadoNome: z.string().min(1),
+  // Opcional: backups gerados antes da forma de pagamento existir não têm
+  // este campo, e precisam continuar importáveis.
+  metodoPagamentoNome: z.string().nullish(),
   createdAt: z.number(),
   updatedAt: z.number().nullable(),
   itens: z.array(exportedItemSchema).min(1)

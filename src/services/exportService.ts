@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 
@@ -37,6 +37,7 @@ export function buildExportPayload(
     compras: compras.map((c) => ({
       mes: c.mes,
       mercadoNome: c.mercadoNome,
+      metodoPagamentoNome: c.metodoPagamentoNome,
       createdAt: c.createdAt,
       updatedAt: c.updatedAt,
       itens: c.itens.map((i) => ({
