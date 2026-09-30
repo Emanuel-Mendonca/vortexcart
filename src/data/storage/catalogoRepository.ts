@@ -1,5 +1,6 @@
 import { CATEGORIA_PADRAO } from '@/constants';
 import type { CatalogoItem, PrecoMedioItem } from '@/types';
+import { mesmoNome } from '@/utils/texto';
 
 import { getDb } from './db';
 
@@ -10,17 +11,30 @@ export async function listCatalogo(): Promise<CatalogoItem[]> {
   );
 }
 
+/**
+ * @returns `true` se o item entrou no catálogo, `false` se já existia — o
+ * `INSERT OR IGNORE` não falha em nome duplicado, ele simplesmente não grava,
+ * e sem esse retorno a tela não teria como diferenciar os dois casos.
+ */
 export async function addCatalogoItem(
   nomeBruto: string,
   categoria: string = CATEGORIA_PADRAO
-): Promise<void> {
+): Promise<boolean> {
   const nome = nomeBruto.trim();
-  if (!nome) return;
+  if (!nome) return false;
   const db = await getDb();
-  await db.runAsync('INSERT OR IGNORE INTO catalogo_itens (nome, categoria) VALUES (?, ?)', [
-    nome,
-    categoria
-  ]);
+
+  // O UNIQUE da coluna só barra o nome idêntico — "Cafe" e "Café" entrariam os
+  // dois. A comparação sem acento/caixa fica aqui, no JS, porque o SQLite não
+  // normaliza caracteres acentuados sem extensão ICU.
+  const existentes = await db.getAllAsync<{ nome: string }>('SELECT nome FROM catalogo_itens');
+  if (existentes.some((linha) => mesmoNome(linha.nome, nome))) return false;
+
+  const resultado = await db.runAsync(
+    'INSERT OR IGNORE INTO catalogo_itens (nome, categoria) VALUES (?, ?)',
+    [nome, categoria]
+  );
+  return resultado.changes > 0;
 }
 
 export async function renameCatalogoItem(

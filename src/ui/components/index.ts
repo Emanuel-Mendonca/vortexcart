@@ -9,3 +9,7 @@ export * from './ConfirmModal';
 export * from './MonthPicker';
 export * from './AmbientGlow';
 export * from './Toast';
+export * from './Screen';
+export * from './SeletorCategoria';
+export * from './Onboarding';
+export * from './TelaAbertura';

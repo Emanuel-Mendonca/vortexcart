@@ -4,12 +4,21 @@ import type { ComponentProps } from 'react';
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
 
 const ICONE_POR_CATEGORIA: Record<string, IoniconName> = {
+  Padaria: 'pizza-outline',
   Mercearia: 'basket-outline',
   Hortifruti: 'nutrition-outline',
-  Laticínios: 'water-outline',
+  Congelados: 'snow-outline',
+  'Frios e Laticínios': 'water-outline',
+  Carnes: 'restaurant-outline',
   Bebidas: 'wine-outline',
+  Matinais: 'cafe-outline',
+  Sobremesas: 'ice-cream-outline',
+  'Cereais e Farináceos': 'leaf-outline',
+  'Biscoitos e Chocolates': 'gift-outline',
   Limpeza: 'sparkles-outline',
-  Outros: 'pricetag-outline'
+  'Perfumaria e Higiene': 'flower-outline',
+  Animais: 'paw-outline',
+  'Bazar e Utilidades': 'construct-outline'
 };
 
 export function getCategoriaIcon(categoria: string | undefined): IoniconName {

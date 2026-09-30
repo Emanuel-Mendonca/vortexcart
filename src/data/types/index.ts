@@ -12,6 +12,11 @@ export interface Mercado {
   nome: string;
 }
 
+export interface MetodoPagamento {
+  id: number;
+  nome: string;
+}
+
 export interface CatalogoItem {
   id: number;
   nome: string;
@@ -41,6 +46,8 @@ export interface Compra {
   mes: string; // formato "YYYY-MM"
   mercadoId: number;
   total: number;
+  /** Nulo em compras registradas antes de existir forma de pagamento. */
+  metodoPagamentoId: number | null;
   createdAt: number;
   updatedAt: number | null;
 }
@@ -48,6 +55,7 @@ export interface Compra {
 /** Compra "achatada" para exibição em tela, já com nome do mercado e itens. */
 export interface CompraComItens extends Compra {
   mercadoNome: string;
+  metodoPagamentoNome: string | null;
   itens: ItemCompra[];
 }
 
@@ -55,6 +63,7 @@ export interface CompraComItens extends Compra {
 export interface NovaCompraInput {
   mes: string;
   mercadoNome: string;
+  metodoPagamentoNome: string | null;
   itens: NovoItemCompra[];
 }
 
@@ -84,6 +93,7 @@ export interface ExportedItem {
 export interface ExportedCompra {
   mes: string;
   mercadoNome: string;
+  metodoPagamentoNome?: string | null;
   createdAt: number;
   updatedAt: number | null;
   itens: ExportedItem[];

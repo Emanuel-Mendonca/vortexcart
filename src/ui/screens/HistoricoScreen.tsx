@@ -11,12 +11,20 @@ import {
   useColorScheme
 } from 'react-native';
 
-import { AmbientGlow, Badge, Card, ConfirmModal, EmptyState, IconButton } from '@/components';
+import {
+  AmbientGlow,
+  Badge,
+  Card,
+  ConfirmModal,
+  EmptyState,
+  IconButton,
+  Screen
+} from '@/components';
 import { useComprasStore } from '@/store/useComprasStore';
 import { getTheme } from '@/theme';
 import type { CompraComItens } from '@/types';
 import { formatBRL } from '@/utils/currency';
-import { monthLabel } from '@/utils/date';
+import { currentMonthValue, monthLabel } from '@/utils/date';
 
 interface GrupoMes {
   mes: string;
@@ -40,6 +48,45 @@ export function HistoricoScreen() {
 
   const [confirmarExclusaoId, setConfirmarExclusaoId] = useState<number | null>(null);
   const [busca, setBusca] = useState('');
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
+
+  const temFiltro = filtroMes != null || filtroMercado != null;
+
+  function limparFiltros() {
+    setFiltroMes(null);
+    setFiltroMercado(null);
+  }
+
+  /**
+   * Atalhos para os períodos mais consultados. Só aparecem quando existe
+   * compra no período — oferecer "Mês passado" sem dado nenhum leva a uma
+   * lista vazia e à impressão de que o filtro quebrou.
+   */
+  const atalhosPeriodo = useMemo(() => {
+    const agora = new Date();
+    const candidatos = [
+      { rotulo: 'Este mês', mes: currentMonthValue(agora) },
+      {
+        rotulo: 'Mês passado',
+        mes: currentMonthValue(new Date(agora.getFullYear(), agora.getMonth() - 1, 1))
+      }
+    ];
+    return candidatos.filter((c) => mesesDisponiveis.includes(c.mes));
+  }, [mesesDisponiveis]);
+
+  /** Meses agrupados por ano — uma lista corrida vira um paredão de chips. */
+  const mesesPorAno = useMemo(() => {
+    const mapa = new Map<string, string[]>();
+    for (const mes of mesesDisponiveis) {
+      const ano = mes.slice(0, 4);
+      const lista = mapa.get(ano) ?? [];
+      lista.push(mes);
+      mapa.set(ano, lista);
+    }
+    return Array.from(mapa.entries())
+      .sort((a, b) => (a[0] < b[0] ? 1 : -1))
+      .map(([ano, meses]) => ({ ano, meses }));
+  }, [mesesDisponiveis]);
 
   const comprasFiltradas = useMemo(() => {
     const termo = busca.trim().toLowerCase();
@@ -67,8 +114,9 @@ export function HistoricoScreen() {
   const rotuloPeriodo = filtroMes ? monthLabel(filtroMes) : 'Todo o período';
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+    <Screen>
       <FlatList
+        keyboardShouldPersistTaps="handled"
         data={grupos}
         keyExtractor={(g) => g.mes}
         contentContainerStyle={{ padding: theme.spacing.lg, paddingBottom: 40 }}
@@ -114,42 +162,86 @@ export function HistoricoScreen() {
               <FiltroChip
                 label={filtroMes ? monthLabel(filtroMes) : 'Todos os meses'}
                 ativo={filtroMes != null}
-                onPress={() => setFiltroMes(null)}
+                onPress={() => setFiltrosAbertos((v) => !v)}
                 icon="calendar-outline"
               />
               <FiltroChip
                 label={filtroMercado ?? 'Todos os mercados'}
                 ativo={filtroMercado != null}
-                onPress={() => setFiltroMercado(null)}
+                onPress={() => setFiltrosAbertos((v) => !v)}
                 icon="storefront-outline"
               />
+              {temFiltro ? (
+                <Pressable onPress={limparFiltros} hitSlop={8} style={styles.limparFiltros}>
+                  <Ionicons name="close-circle" size={14} color={theme.colors.textMuted} />
+                  <Text
+                    style={{
+                      fontFamily: theme.fontFamily.semiBold,
+                      fontSize: theme.type.caption.fontSize,
+                      color: theme.colors.textMuted
+                    }}
+                  >
+                    limpar
+                  </Text>
+                </Pressable>
+              ) : null}
             </View>
 
-            {mesesDisponiveis.length > 0 ? (
-              <View style={styles.chipsRow}>
-                {mesesDisponiveis.map((mes) => (
-                  <FiltroChip
-                    key={mes}
-                    label={monthLabel(mes)}
-                    ativo={filtroMes === mes}
-                    onPress={() => setFiltroMes(filtroMes === mes ? null : mes)}
-                    compact
-                  />
-                ))}
-              </View>
-            ) : null}
+            {filtrosAbertos ? (
+              <View>
+                {atalhosPeriodo.length > 0 ? (
+                  <View style={styles.chipsRow}>
+                    {atalhosPeriodo.map((atalho) => (
+                      <FiltroChip
+                        key={atalho.rotulo}
+                        label={atalho.rotulo}
+                        ativo={filtroMes === atalho.mes}
+                        onPress={() => setFiltroMes(filtroMes === atalho.mes ? null : atalho.mes)}
+                        compact
+                      />
+                    ))}
+                  </View>
+                ) : null}
 
-            {mercadosSugeridos.length > 0 ? (
-              <View style={styles.chipsRow}>
-                {mercadosSugeridos.map((mercado) => (
-                  <FiltroChip
-                    key={mercado}
-                    label={mercado}
-                    ativo={filtroMercado === mercado}
-                    onPress={() => setFiltroMercado(filtroMercado === mercado ? null : mercado)}
-                    compact
-                  />
+                {mesesPorAno.map(({ ano, meses }) => (
+                  <View key={ano}>
+                    <Text style={[styles.grupoFiltroLabel, { color: theme.colors.textFaint }]}>
+                      {ano}
+                    </Text>
+                    <View style={styles.chipsRow}>
+                      {meses.map((mes) => (
+                        <FiltroChip
+                          key={mes}
+                          label={rotuloMesCurto(mes)}
+                          ativo={filtroMes === mes}
+                          onPress={() => setFiltroMes(filtroMes === mes ? null : mes)}
+                          compact
+                        />
+                      ))}
+                    </View>
+                  </View>
                 ))}
+
+                {mercadosSugeridos.length > 0 ? (
+                  <View>
+                    <Text style={[styles.grupoFiltroLabel, { color: theme.colors.textFaint }]}>
+                      Comércios
+                    </Text>
+                    <View style={styles.chipsRow}>
+                      {mercadosSugeridos.map((mercado) => (
+                        <FiltroChip
+                          key={mercado}
+                          label={mercado}
+                          ativo={filtroMercado === mercado}
+                          onPress={() =>
+                            setFiltroMercado(filtroMercado === mercado ? null : mercado)
+                          }
+                          compact
+                        />
+                      ))}
+                    </View>
+                  </View>
+                ) : null}
               </View>
             ) : null}
 
@@ -254,6 +346,7 @@ export function HistoricoScreen() {
                       }}
                     >
                       {compra.itens.length} {compra.itens.length === 1 ? 'item' : 'itens'}
+                      {compra.metodoPagamentoNome ? ` · ${compra.metodoPagamentoNome}` : ''}
                     </Text>
                   </View>
                   <View style={{ flexDirection: 'row', gap: 4 }}>
@@ -344,8 +437,15 @@ export function HistoricoScreen() {
         }}
         onDismiss={() => setConfirmarExclusaoId(null)}
       />
-    </View>
+    </Screen>
   );
+}
+
+/** "setembro de 2026" -> "Set" — dentro do grupo do ano, o ano é redundante. */
+function rotuloMesCurto(mes: string): string {
+  const completo = monthLabel(mes);
+  const nome = completo.split(' de ')[0] ?? completo;
+  return nome.charAt(0).toUpperCase() + nome.slice(1, 3);
 }
 
 function FiltroChip({
@@ -412,6 +512,14 @@ const styles = StyleSheet.create({
   },
   searchInput: { flex: 1, fontSize: 14 },
   filtros: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
+  limparFiltros: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 4 },
+  grupoFiltroLabel: {
+    fontSize: 10,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginTop: 10,
+    marginBottom: 6
+  },
   chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 8 },
   chip: {
     paddingHorizontal: 14,

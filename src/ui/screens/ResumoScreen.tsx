@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, useColorScheme } from 'react-native';
 import Svg, { Polyline } from 'react-native-svg';
 
-import { AmbientGlow, Badge, Card, EmptyState, Toast } from '@/components';
+import { AmbientGlow, Badge, Card, EmptyState, Screen, Toast } from '@/components';
 import {
   ExportIndisponivelError,
   ImportCanceladoError,
@@ -21,7 +21,26 @@ import { monthLabel } from '@/utils/date';
 
 type Operacao = 'json' | 'csv' | 'pdf' | 'importar' | null;
 
+/** Altura útil da área das barras (sem os rótulos dos meses). */
 const CHART_HEIGHT = 130;
+/**
+ * Espaço reservado acima da barra mais alta — cabe o balão com o valor
+ * (`tooltip`, top: -22) e a barra não encosta no cabeçalho do card.
+ */
+const CHART_HEADROOM = 28;
+/** Altura mínima para um mês com gasto ínfimo ainda ser tocável. */
+const CHART_MIN_BAR = 6;
+/** Largura de cada coluna no sistema de coordenadas do SVG. */
+const CHART_COL = 48;
+
+/**
+ * Altura da barra em px — a MESMA função alimenta a barra e o ponto da linha,
+ * para que a linha tracejada toque exatamente o topo de cada barra.
+ */
+function alturaBarra(total: number, maxMes: number): number {
+  if (maxMes <= 0) return CHART_MIN_BAR;
+  return Math.max(CHART_MIN_BAR, (total / maxMes) * (CHART_HEIGHT - CHART_HEADROOM));
+}
 
 export function ResumoScreen() {
   const scheme = useColorScheme();
@@ -77,8 +96,11 @@ export function ResumoScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <ScrollView contentContainerStyle={{ padding: theme.spacing.lg, paddingBottom: 40 }}>
+    <Screen>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ padding: theme.spacing.lg, paddingBottom: 40 }}
+      >
         <AmbientGlow color={theme.colors.primary} size={240} top={-40} right={-90} opacity={0.16} />
         <AmbientGlow color={theme.colors.accent} size={180} top={260} left={-70} opacity={0.1} />
 
@@ -205,17 +227,20 @@ export function ResumoScreen() {
             <EmptyState icon="bar-chart-outline" message="Ainda sem dados suficientes." />
           ) : (
             <>
+              {/* A área das barras e o SVG têm exatamente a mesma altura
+                  (CHART_HEIGHT), e os rótulos ficam FORA dela — assim o
+                  viewBox não é esticado e a linha cai onde a barra termina. */}
               <View style={styles.chartArea}>
                 <Svg
                   style={StyleSheet.absoluteFill}
-                  viewBox={`0 0 ${gastoPorMes.length * 48} ${CHART_HEIGHT}`}
+                  viewBox={`0 0 ${gastoPorMes.length * CHART_COL} ${CHART_HEIGHT}`}
                   preserveAspectRatio="none"
                 >
                   <Polyline
                     points={gastoPorMes
                       .map((g, i) => {
-                        const x = i * 48 + 24;
-                        const y = CHART_HEIGHT - (g.total / maxMes) * (CHART_HEIGHT - 10) - 4;
+                        const x = i * CHART_COL + CHART_COL / 2;
+                        const y = CHART_HEIGHT - alturaBarra(g.total, maxMes);
                         return `${x},${y}`;
                       })
                       .join(' ')}
@@ -228,7 +253,6 @@ export function ResumoScreen() {
                 </Svg>
                 <View style={styles.barsRow}>
                   {gastoPorMes.map((g) => {
-                    const alturaPct = Math.max(6, (g.total / maxMes) * 100);
                     const selecionado = mesSelecionado === g.mes;
                     return (
                       <Pressable
@@ -236,49 +260,57 @@ export function ResumoScreen() {
                         style={styles.barColumn}
                         onPress={() => setMesSelecionado(selecionado ? null : g.mes)}
                       >
-                        {selecionado ? (
-                          <View
-                            style={[
-                              styles.tooltip,
-                              {
-                                backgroundColor: theme.colors.surfaceAlt,
-                                borderColor: theme.colors.border
-                              }
-                            ]}
-                          >
-                            <Text
-                              style={{
-                                fontFamily: theme.fontFamily.bold,
-                                fontSize: 10,
-                                color: theme.colors.primary
-                              }}
+                        <View style={{ alignItems: 'center' }}>
+                          {selecionado ? (
+                            <View
+                              style={[
+                                styles.tooltip,
+                                {
+                                  backgroundColor: theme.colors.surfaceAlt,
+                                  borderColor: theme.colors.border
+                                }
+                              ]}
                             >
-                              {formatBRL(g.total)}
-                            </Text>
-                          </View>
-                        ) : null}
-                        <LinearGradient
-                          colors={[theme.colors.primary, theme.colors.accent]}
-                          start={{ x: 0, y: 1 }}
-                          end={{ x: 0, y: 0 }}
-                          style={[styles.bar, { height: `${alturaPct}%` }]}
-                        />
-                        <Text
-                          numberOfLines={1}
-                          style={{
-                            fontFamily: theme.fontFamily.semiBold,
-                            fontSize: 10,
-                            marginTop: 6,
-                            color: theme.colors.textMuted,
-                            textTransform: 'capitalize'
-                          }}
-                        >
-                          {monthLabel(g.mes).split(' de ')[0]?.slice(0, 3)}
-                        </Text>
+                              <Text
+                                style={{
+                                  fontFamily: theme.fontFamily.bold,
+                                  fontSize: 10,
+                                  color: theme.colors.primary
+                                }}
+                              >
+                                {formatBRL(g.total)}
+                              </Text>
+                            </View>
+                          ) : null}
+                          <LinearGradient
+                            colors={[theme.colors.primary, theme.colors.accent]}
+                            start={{ x: 0, y: 1 }}
+                            end={{ x: 0, y: 0 }}
+                            style={[styles.bar, { height: alturaBarra(g.total, maxMes) }]}
+                          />
+                        </View>
                       </Pressable>
                     );
                   })}
                 </View>
+              </View>
+              <View style={styles.labelsRow}>
+                {gastoPorMes.map((g) => (
+                  <Text
+                    key={g.mes}
+                    numberOfLines={1}
+                    style={{
+                      flex: 1,
+                      textAlign: 'center',
+                      fontFamily: theme.fontFamily.semiBold,
+                      fontSize: 10,
+                      color: theme.colors.textMuted,
+                      textTransform: 'capitalize'
+                    }}
+                  >
+                    {monthLabel(g.mes).split(' de ')[0]?.slice(0, 3)}
+                  </Text>
+                ))}
               </View>
             </>
           )}
@@ -306,22 +338,36 @@ export function ResumoScreen() {
             comparativoMercados.map((m, index) => (
               <View key={m.mercadoId} style={styles.marketBlock}>
                 <View style={styles.marketTopRow}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
-                    <Text
-                      style={{ fontFamily: theme.fontFamily.extraBold, color: theme.colors.text }}
-                    >
-                      {m.mercadoNome}
-                    </Text>
-                    {index === 0 && comparativoMercados.length > 1 ? (
-                      <Badge label="Mais econômico" icon="pricetag-outline" />
-                    ) : null}
-                  </View>
+                  {/* Nome e valor na mesma linha, com o nome truncando: nomes
+                      longos de mercado empurravam o valor para fora da tela. */}
                   <Text
-                    style={{ fontFamily: theme.fontFamily.extraBold, color: theme.colors.primary }}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    style={{
+                      flex: 1,
+                      fontFamily: theme.fontFamily.extraBold,
+                      color: theme.colors.text
+                    }}
+                  >
+                    {m.mercadoNome}
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: theme.fontFamily.extraBold,
+                      color: theme.colors.primary,
+                      marginLeft: 10
+                    }}
                   >
                     {formatBRL(m.mediaPorCompra)}
                   </Text>
                 </View>
+                {/* O selo ganha linha própria — ao lado do nome, ele competia
+                    pelo mesmo espaço e sobrepunha o valor. */}
+                {index === 0 && comparativoMercados.length > 1 ? (
+                  <View style={{ alignSelf: 'flex-start', marginTop: 6 }}>
+                    <Badge label="Mais econômico" icon="pricetag-outline" />
+                  </View>
+                ) : null}
                 <View style={[styles.progressTrack, { backgroundColor: theme.colors.background }]}>
                   <LinearGradient
                     colors={[theme.colors.accent, theme.colors.primary]}
@@ -472,7 +518,7 @@ export function ResumoScreen() {
       </ScrollView>
 
       <Toast message={toastMsg} onHide={() => setToastMsg(null)} />
-    </View>
+    </Screen>
   );
 }
 
@@ -538,9 +584,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  chartArea: { height: CHART_HEIGHT + 24 },
+  chartArea: { height: CHART_HEIGHT, marginTop: 8 },
   barsRow: { flexDirection: 'row', height: CHART_HEIGHT, alignItems: 'flex-end' },
   barColumn: { flex: 1, alignItems: 'center', justifyContent: 'flex-end', height: '100%' },
+  labelsRow: { flexDirection: 'row', marginTop: 6 },
   bar: { width: 18, borderRadius: 6 },
   tooltip: {
     position: 'absolute',

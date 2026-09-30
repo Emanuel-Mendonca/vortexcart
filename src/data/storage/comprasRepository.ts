@@ -3,7 +3,8 @@ import { calcularTotal } from '@/utils/totals';
 
 import { ensureCatalogoContem } from './catalogoRepository';
 import { getDb } from './db';
-import { getOrCreateMercado } from './mercadosRepository';
+import { getOrCreateMercado, limparMercadosOrfaos } from './mercadosRepository';
+import { getOrCreateMetodoPagamento } from './metodosPagamentoRepository';
 
 export { calcularTotal };
 
@@ -12,6 +13,8 @@ interface CompraRow {
   mes: string;
   mercado_id: number;
   mercado_nome: string;
+  metodo_pagamento_id: number | null;
+  metodo_pagamento_nome: string | null;
   total: number;
   created_at: number;
   updated_at: number | null;
@@ -60,9 +63,12 @@ export async function listComprasComItens(filtro: FiltroCompras = {}): Promise<C
   const where = condicoes.length > 0 ? `WHERE ${condicoes.join(' AND ')}` : '';
 
   const compraRows = await db.getAllAsync<CompraRow>(
-    `SELECT c.id, c.mes, c.mercado_id, m.nome as mercado_nome, c.total, c.created_at, c.updated_at
+    `SELECT c.id, c.mes, c.mercado_id, m.nome as mercado_nome,
+            c.metodo_pagamento_id, mp.nome as metodo_pagamento_nome,
+            c.total, c.created_at, c.updated_at
      FROM compras c
      JOIN mercados m ON m.id = c.mercado_id
+     LEFT JOIN metodos_pagamento mp ON mp.id = c.metodo_pagamento_id
      ${where}
      ORDER BY c.created_at DESC`,
     params
@@ -92,6 +98,8 @@ export async function listComprasComItens(filtro: FiltroCompras = {}): Promise<C
     mes: row.mes,
     mercadoId: row.mercado_id,
     mercadoNome: row.mercado_nome,
+    metodoPagamentoId: row.metodo_pagamento_id,
+    metodoPagamentoNome: row.metodo_pagamento_nome,
     total: row.total,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -102,12 +110,15 @@ export async function listComprasComItens(filtro: FiltroCompras = {}): Promise<C
 export async function criarCompra(input: NovaCompraInput): Promise<number> {
   const db = await getDb();
   const mercadoId = await getOrCreateMercado(input.mercadoNome);
+  const metodoId = input.metodoPagamentoNome
+    ? await getOrCreateMetodoPagamento(input.metodoPagamentoNome)
+    : null;
   const total = calcularTotal(input.itens);
   const agora = Date.now();
 
   const resultado = await db.runAsync(
-    'INSERT INTO compras (mes, mercado_id, total, created_at, updated_at) VALUES (?, ?, ?, ?, NULL)',
-    [input.mes, mercadoId, total, agora]
+    'INSERT INTO compras (mes, mercado_id, metodo_pagamento_id, total, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NULL)',
+    [input.mes, mercadoId, metodoId, total, agora]
   );
   const compraId = resultado.lastInsertRowId;
 
@@ -119,6 +130,7 @@ export async function criarCompra(input: NovaCompraInput): Promise<number> {
   }
 
   await ensureCatalogoContem(input.itens.map((i) => i.nome));
+  await limparMercadosOrfaos();
 
   return compraId;
 }
@@ -126,11 +138,14 @@ export async function criarCompra(input: NovaCompraInput): Promise<number> {
 export async function atualizarCompra(id: number, input: NovaCompraInput): Promise<void> {
   const db = await getDb();
   const mercadoId = await getOrCreateMercado(input.mercadoNome);
+  const metodoId = input.metodoPagamentoNome
+    ? await getOrCreateMetodoPagamento(input.metodoPagamentoNome)
+    : null;
   const total = calcularTotal(input.itens);
 
   await db.runAsync(
-    'UPDATE compras SET mes = ?, mercado_id = ?, total = ?, updated_at = ? WHERE id = ?',
-    [input.mes, mercadoId, total, Date.now(), id]
+    'UPDATE compras SET mes = ?, mercado_id = ?, metodo_pagamento_id = ?, total = ?, updated_at = ? WHERE id = ?',
+    [input.mes, mercadoId, metodoId, total, Date.now(), id]
   );
 
   await db.runAsync('DELETE FROM itens_compra WHERE compra_id = ?', [id]);
@@ -142,12 +157,16 @@ export async function atualizarCompra(id: number, input: NovaCompraInput): Promi
   }
 
   await ensureCatalogoContem(input.itens.map((i) => i.nome));
+  // A correção de um nome deixa o mercado antigo sem compras; sem esta
+  // limpeza ele continuaria aparecendo no filtro do Histórico.
+  await limparMercadosOrfaos();
 }
 
 export async function excluirCompra(id: number): Promise<void> {
   const db = await getDb();
   await db.runAsync('DELETE FROM itens_compra WHERE compra_id = ?', [id]);
   await db.runAsync('DELETE FROM compras WHERE id = ?', [id]);
+  await limparMercadosOrfaos();
 }
 
 export async function listMesesComCompras(): Promise<string[]> {
@@ -167,11 +186,14 @@ export async function listMesesComCompras(): Promise<string[]> {
 export async function inserirCompraImportada(compra: ExportedCompra): Promise<void> {
   const db = await getDb();
   const mercadoId = await getOrCreateMercado(compra.mercadoNome);
+  const metodoId = compra.metodoPagamentoNome
+    ? await getOrCreateMetodoPagamento(compra.metodoPagamentoNome)
+    : null;
   const total = compra.itens.reduce((soma, item) => soma + item.quantidade * item.valorUnitario, 0);
 
   const resultado = await db.runAsync(
-    'INSERT INTO compras (mes, mercado_id, total, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
-    [compra.mes, mercadoId, total, compra.createdAt, compra.updatedAt]
+    'INSERT INTO compras (mes, mercado_id, metodo_pagamento_id, total, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+    [compra.mes, mercadoId, metodoId, total, compra.createdAt, compra.updatedAt]
   );
   const compraId = resultado.lastInsertRowId;
 

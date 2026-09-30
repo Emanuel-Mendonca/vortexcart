@@ -11,6 +11,8 @@ interface TextFieldProps {
   error?: string;
   keyboardType?: KeyboardTypeOptions;
   textAlign?: 'left' | 'right';
+  /** Usado pelas telas para rolar o conteúdo até o campo quando o teclado abre. */
+  onFocus?: () => void;
 }
 
 export function TextField({
@@ -20,7 +22,8 @@ export function TextField({
   placeholder,
   error,
   keyboardType = 'default',
-  textAlign = 'left'
+  textAlign = 'left',
+  onFocus
 }: TextFieldProps) {
   const scheme = useColorScheme();
   const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
@@ -43,6 +46,7 @@ export function TextField({
       <TextInput
         value={value}
         onChangeText={onChangeText}
+        onFocus={onFocus}
         placeholder={placeholder}
         placeholderTextColor={theme.colors.textFaint}
         keyboardType={keyboardType}

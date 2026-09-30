@@ -1,12 +1,30 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
-import { FlatList, Modal, Pressable, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import {
+  FlatList,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  useColorScheme
+} from 'react-native';
 
-import { AmbientGlow, Button, ConfirmModal, EmptyState, TextField, Toast } from '@/components';
+import {
+  AmbientGlow,
+  Button,
+  ConfirmModal,
+  EmptyState,
+  Screen,
+  SeletorCategoria,
+  TextField,
+  Toast
+} from '@/components';
 import { CATEGORIAS, CATEGORIA_PADRAO } from '@/constants';
 import { useComprasStore } from '@/store/useComprasStore';
 import { getTheme } from '@/theme';
-import type { CatalogoItem } from '@/types';
+import type { CatalogoItem, MetodoPagamento } from '@/types';
 import { getCategoriaIcon } from '@/utils/categoria';
 import { formatBRL } from '@/utils/currency';
 
@@ -17,6 +35,9 @@ export function ItensScreen() {
   const catalogo = useComprasStore((s) => s.catalogo);
   const precoMedioPorItem = useComprasStore((s) => s.precoMedioPorItem);
   const adicionarItemCatalogo = useComprasStore((s) => s.adicionarItemCatalogo);
+  const metodosPagamento = useComprasStore((s) => s.metodosPagamento);
+  const adicionarMetodoPagamento = useComprasStore((s) => s.adicionarMetodoPagamento);
+  const removerMetodoPagamento = useComprasStore((s) => s.removerMetodoPagamento);
   const renomearItemCatalogo = useComprasStore((s) => s.renomearItemCatalogo);
   const removerItemCatalogo = useComprasStore((s) => s.removerItemCatalogo);
 
@@ -27,6 +48,10 @@ export function ItensScreen() {
   const [nomeEdicao, setNomeEdicao] = useState('');
   const [categoriaEdicao, setCategoriaEdicao] = useState(CATEGORIA_PADRAO);
   const [confirmarRemocao, setConfirmarRemocao] = useState<CatalogoItem | null>(null);
+  const [confirmarRemocaoMetodo, setConfirmarRemocaoMetodo] = useState<MetodoPagamento | null>(
+    null
+  );
+  const [novoMetodo, setNovoMetodo] = useState('');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   const categoriasAtivas = useMemo(
@@ -40,11 +65,46 @@ export function ItensScreen() {
   }, [catalogo, categoriaFiltro]);
 
   async function handleAdicionar() {
-    if (!novoNome.trim()) return;
-    await adicionarItemCatalogo(novoNome.trim(), novaCategoria);
-    setToastMsg(`"${novoNome.trim()}" adicionado ao catálogo`);
-    setNovoNome('');
-    setNovaCategoria(CATEGORIA_PADRAO);
+    const nome = novoNome.trim();
+    // Sem `return` mudo: o botão fica sempre habilitado e cada caminho diz o
+    // que aconteceu, senão um toque sem efeito parece um botão quebrado.
+    if (!nome) {
+      setToastMsg('Digite o nome do item antes de adicionar');
+      return;
+    }
+    try {
+      const inserido = await adicionarItemCatalogo(nome, novaCategoria);
+      if (inserido) {
+        setToastMsg(`"${nome}" adicionado ao catálogo`);
+        setNovoNome('');
+        setNovaCategoria(CATEGORIA_PADRAO);
+      } else {
+        setToastMsg(`"${nome}" já está no catálogo`);
+      }
+    } catch (erro) {
+      console.error('Falha ao adicionar item ao catálogo', erro);
+      setToastMsg('Não foi possível salvar o item');
+    }
+  }
+
+  async function handleAdicionarMetodo() {
+    const nome = novoMetodo.trim();
+    if (!nome) {
+      setToastMsg('Digite o nome da forma de pagamento');
+      return;
+    }
+    try {
+      const inserido = await adicionarMetodoPagamento(nome);
+      if (inserido) {
+        setToastMsg(`"${nome}" cadastrada`);
+        setNovoMetodo('');
+      } else {
+        setToastMsg(`"${nome}" já está cadastrada`);
+      }
+    } catch (erro) {
+      console.error('Falha ao cadastrar forma de pagamento', erro);
+      setToastMsg('Não foi possível cadastrar');
+    }
   }
 
   function abrirEdicao(item: CatalogoItem) {
@@ -61,8 +121,9 @@ export function ItensScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+    <Screen>
       <FlatList
+        keyboardShouldPersistTaps="handled"
         data={catalogoFiltrado}
         keyExtractor={(item) => String(item.id)}
         contentContainerStyle={{ padding: theme.spacing.lg, paddingBottom: 40 }}
@@ -120,46 +181,84 @@ export function ItensScreen() {
                 value={novoNome}
                 onChangeText={setNovoNome}
               />
-              <View style={styles.categoriaRow}>
-                {CATEGORIAS.map((cat) => (
-                  <Pressable
-                    key={cat}
-                    onPress={() => setNovaCategoria(cat)}
-                    style={[
-                      styles.categoriaChip,
-                      {
-                        backgroundColor:
-                          novaCategoria === cat ? theme.colors.primary : theme.colors.background,
-                        borderColor: theme.colors.borderMuted
-                      }
-                    ]}
-                  >
-                    <Ionicons
-                      name={getCategoriaIcon(cat)}
-                      size={12}
-                      color={
-                        novaCategoria === cat ? theme.colors.onPrimary : theme.colors.textMuted
-                      }
-                    />
-                    <Text
-                      style={{
-                        fontFamily: theme.fontFamily.semiBold,
-                        fontSize: 11,
-                        color:
-                          novaCategoria === cat ? theme.colors.onPrimary : theme.colors.textMuted
-                      }}
-                    >
-                      {cat}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
+              <SeletorCategoria
+                label="Departamento"
+                categorias={CATEGORIAS}
+                valor={novaCategoria}
+                onChange={setNovaCategoria}
+              />
               <View style={{ marginTop: 10 }}>
                 <Button
                   label="Adicionar"
                   icon={<Ionicons name="add" size={16} color={theme.colors.onPrimary} />}
                   onPress={handleAdicionar}
-                  disabled={!novoNome.trim()}
+                />
+              </View>
+            </View>
+
+            <View
+              style={[
+                styles.headerCard,
+                { backgroundColor: theme.colors.surfaceAlt, borderColor: theme.colors.borderMuted }
+              ]}
+            >
+              <Text
+                style={{
+                  fontFamily: theme.fontFamily.bold,
+                  fontSize: theme.type.title.fontSize,
+                  color: theme.colors.text
+                }}
+              >
+                Formas de pagamento
+              </Text>
+              <Text
+                style={{
+                  fontFamily: theme.fontFamily.medium,
+                  fontSize: theme.type.caption.fontSize,
+                  color: theme.colors.textMuted,
+                  marginTop: 4,
+                  marginBottom: 12
+                }}
+              >
+                Aparecem como opção ao registrar uma compra.
+              </Text>
+
+              {metodosPagamento.map((metodo) => (
+                <View
+                  key={metodo.id}
+                  style={[styles.metodoLinha, { borderColor: theme.colors.borderMuted }]}
+                >
+                  <Ionicons name="wallet-outline" size={16} color={theme.colors.primary} />
+                  <Text
+                    style={{
+                      flex: 1,
+                      fontFamily: theme.fontFamily.semiBold,
+                      fontSize: theme.type.body.fontSize,
+                      color: theme.colors.text
+                    }}
+                  >
+                    {metodo.nome}
+                  </Text>
+                  <Pressable
+                    onPress={() => setConfirmarRemocaoMetodo(metodo)}
+                    hitSlop={8}
+                    style={{ padding: 4 }}
+                  >
+                    <Ionicons name="trash-outline" size={16} color={theme.colors.textFaint} />
+                  </Pressable>
+                </View>
+              ))}
+
+              <View style={{ marginTop: 10 }}>
+                <TextField
+                  placeholder="Nova forma, ex: Nubank crédito"
+                  value={novoMetodo}
+                  onChangeText={setNovoMetodo}
+                />
+                <Button
+                  label="Cadastrar forma de pagamento"
+                  icon={<Ionicons name="add" size={16} color={theme.colors.onPrimary} />}
+                  onPress={handleAdicionarMetodo}
                 />
               </View>
             </View>
@@ -190,7 +289,13 @@ export function ItensScreen() {
               </Text>
             </View>
 
-            <View style={styles.filterScroll}>
+            {/* Rolagem horizontal: com 15 departamentos, a versão que
+                quebrava linha ocupava um terço da tela só de filtro. */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.filterScroll}
+            >
               <Pressable
                 onPress={() => setCategoriaFiltro(null)}
                 style={[
@@ -245,7 +350,7 @@ export function ItensScreen() {
                   </Pressable>
                 );
               })}
-            </View>
+            </ScrollView>
           </View>
         }
         ListEmptyComponent={
@@ -350,33 +455,12 @@ export function ItensScreen() {
               </Pressable>
             </View>
             <TextField value={nomeEdicao} onChangeText={setNomeEdicao} />
-            <View style={styles.categoriaRow}>
-              {CATEGORIAS.map((cat) => (
-                <Pressable
-                  key={cat}
-                  onPress={() => setCategoriaEdicao(cat)}
-                  style={[
-                    styles.categoriaChip,
-                    {
-                      backgroundColor:
-                        categoriaEdicao === cat ? theme.colors.primary : theme.colors.background,
-                      borderColor: theme.colors.borderMuted
-                    }
-                  ]}
-                >
-                  <Text
-                    style={{
-                      fontFamily: theme.fontFamily.semiBold,
-                      fontSize: 11,
-                      color:
-                        categoriaEdicao === cat ? theme.colors.onPrimary : theme.colors.textMuted
-                    }}
-                  >
-                    {cat}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
+            <SeletorCategoria
+              label="Departamento"
+              categorias={CATEGORIAS}
+              valor={categoriaEdicao}
+              onChange={setCategoriaEdicao}
+            />
             <View style={styles.modalActions}>
               <View style={{ flex: 1 }}>
                 <Button label="Cancelar" variant="secondary" onPress={() => setEditando(null)} />
@@ -399,8 +483,18 @@ export function ItensScreen() {
         onDismiss={() => setConfirmarRemocao(null)}
       />
 
+      <ConfirmModal
+        visible={confirmarRemocaoMetodo != null}
+        message={`Remover "${confirmarRemocaoMetodo?.nome ?? ''}"? As compras que usaram esta forma de pagamento continuam salvas, apenas sem ela.`}
+        confirmLabel="Remover"
+        onConfirm={() => {
+          if (confirmarRemocaoMetodo) void removerMetodoPagamento(confirmarRemocaoMetodo.id);
+        }}
+        onDismiss={() => setConfirmarRemocaoMetodo(null)}
+      />
+
       <Toast message={toastMsg} onHide={() => setToastMsg(null)} />
-    </View>
+    </Screen>
   );
 }
 
@@ -418,6 +512,13 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1
   },
+  metodoLinha: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 10,
+    borderBottomWidth: 1
+  },
   metricStrip: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -426,7 +527,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12
   },
-  filterScroll: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 14 },
+  filterScroll: { flexDirection: 'row', gap: 6, paddingBottom: 14, paddingRight: 16 },
   filterChip: {
     flexDirection: 'row',
     alignItems: 'center',

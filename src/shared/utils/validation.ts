@@ -14,6 +14,9 @@ export const itemFormSchema = z.object({
 export const novaCompraFormSchema = z.object({
   mes: z.string().min(1, 'Escolha o mês'),
   mercadoNome: z.string().trim().min(1, 'Informe o supermercado'),
+  // Opcional de propósito: registrar a compra não deve travar porque o
+  // usuário não lembra (ou não quer informar) como pagou.
+  metodoPagamentoNome: z.string().nullable().default(null),
   itens: z
     .array(itemFormSchema)
     .min(1, 'Adicione pelo menos um item')

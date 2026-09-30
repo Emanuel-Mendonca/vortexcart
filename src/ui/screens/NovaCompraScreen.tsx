@@ -2,9 +2,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useRef, useState } from 'react';
+import type { ComponentProps } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import {
   Animated,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -21,6 +23,7 @@ import {
   ConfirmModal,
   IconButton,
   MonthPicker,
+  Screen,
   TextField,
   Toast
 } from '@/components';
@@ -29,8 +32,25 @@ import { getTheme } from '@/theme';
 import { getCategoriaIcon } from '@/utils/categoria';
 import { formatBRL } from '@/utils/currency';
 import { currentMonthValue } from '@/utils/date';
+import { mesmoNome, normalizarNome } from '@/utils/texto';
 import { novaCompraFormSchema } from '@/utils/validation';
 import type { NovaCompraFormValues } from '@/utils/validation';
+
+/**
+ * As formas de pagamento são cadastráveis, então o ícone é escolhido pelo
+ * que o nome contém — "Nubank crédito" continua ganhando ícone de cartão.
+ */
+function iconeMetodoPagamento(nome: string): ComponentProps<typeof Ionicons>['name'] {
+  const n = normalizarNome(nome);
+  if (n.includes('vale') || n.includes('refeicao') || n.includes('alimentacao')) {
+    return 'fast-food-outline';
+  }
+  if (n.includes('credito')) return 'card-outline';
+  if (n.includes('debito')) return 'card';
+  if (n.includes('pix')) return 'flash-outline';
+  if (n.includes('dinheiro') || n.includes('especie')) return 'cash-outline';
+  return 'wallet-outline';
+}
 
 function labelStyle(theme: ReturnType<typeof getTheme>) {
   return {
@@ -81,7 +101,12 @@ export function NovaCompraScreen() {
   const cancelarEdicao = useComprasStore((s) => s.cancelarEdicao);
   const editingId = useComprasStore((s) => s.editingId);
   const catalogo = useComprasStore((s) => s.catalogo);
+  const metodosPagamento = useComprasStore((s) => s.metodosPagamento);
+  const adicionarMetodoPagamento = useComprasStore((s) => s.adicionarMetodoPagamento);
+  const precoMedioPorItem = useComprasStore((s) => s.precoMedioPorItem);
   const compraEmEdicao = useCompraEmEdicao();
+  const rascunhoCupom = useComprasStore((s) => s.rascunhoCupom);
+  const definirRascunhoCupom = useComprasStore((s) => s.definirRascunhoCupom);
 
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [confirmacaoFinal, setConfirmacaoFinal] = useState<string | null>(null);
@@ -90,26 +115,80 @@ export function NovaCompraScreen() {
   const [draftQtd, setDraftQtd] = useState('1');
   const [draftValor, setDraftValor] = useState('');
   const [draftExtra, setDraftExtra] = useState(false);
+  const [sugestoesAbertas, setSugestoesAbertas] = useState(false);
+  const [cadastroMetodoAberto, setCadastroMetodoAberto] = useState(false);
+  const [novoMetodoNome, setNovoMetodoNome] = useState('');
+  const scrollRef = useRef<ScrollView>(null);
+  const composerY = useRef(0);
+
+  /**
+   * O bloco de inserção rápida fica no fim da tela, então ao abrir o teclado
+   * ele e o botão "Inserir na lista" caem atrás dele.
+   *
+   * Rolamos até o topo do próprio bloco (e não até o fim da tela): assim o
+   * campo de nome, os valores e o botão ficam todos visíveis de uma vez. Um
+   * `scrollToEnd` passaria do ponto e cortaria justamente o campo que está
+   * sendo digitado.
+   *
+   * O atraso espera a animação de abertura do teclado terminar — antes disso
+   * a altura visível ainda é a antiga e o destino sairia errado.
+   */
+  function revelarComposer() {
+    setTimeout(
+      () => scrollRef.current?.scrollTo({ y: Math.max(0, composerY.current - 12), animated: true }),
+      280
+    );
+  }
 
   const {
     control,
     handleSubmit,
     reset,
+    setValue,
     watch,
     formState: { errors }
   } = useForm<NovaCompraFormValues>({
     resolver: zodResolver(novaCompraFormSchema),
-    defaultValues: { mes: currentMonthValue(), mercadoNome: '', itens: [] }
+    defaultValues: {
+      mes: currentMonthValue(),
+      mercadoNome: '',
+      metodoPagamentoNome: null,
+      itens: []
+    }
   });
 
   const { fields, append, remove, update } = useFieldArray({ control, name: 'itens' });
   const itensAtuais = watch('itens');
+
+  /**
+   * Carrega a compra lida de um cupom fiscal para revisão. Consome o
+   * rascunho na mesma passada para não reaplicá-lo a cada re-render (e não
+   * sobrescrever o que o usuário já corrigiu à mão).
+   */
+  useEffect(() => {
+    if (!rascunhoCupom) return;
+    reset({
+      mes: rascunhoCupom.mes ?? currentMonthValue(),
+      mercadoNome: rascunhoCupom.mercadoNome ?? '',
+      metodoPagamentoNome: null,
+      itens: rascunhoCupom.itens
+    });
+    definirRascunhoCupom(null);
+    const total = rascunhoCupom.itens.length;
+    const reconhecidos = rascunhoCupom.reconhecidos;
+    setToastMsg(
+      `${total} ${total === 1 ? 'item lido' : 'itens lidos'}` +
+        (reconhecidos > 0 ? ` · ${reconhecidos} já no catálogo` : '') +
+        ' — confira antes de salvar'
+    );
+  }, [rascunhoCupom, reset, definirRascunhoCupom]);
 
   useEffect(() => {
     if (compraEmEdicao) {
       reset({
         mes: compraEmEdicao.mes,
         mercadoNome: compraEmEdicao.mercadoNome,
+        metodoPagamentoNome: compraEmEdicao.metodoPagamentoNome,
         itens: compraEmEdicao.itens.map((i) => ({
           nome: i.nome,
           quantidade: i.quantidade,
@@ -131,15 +210,54 @@ export function NovaCompraScreen() {
     setDraftValor('');
     setDraftExtra(false);
     setEditandoIndex(null);
+    setSugestoesAbertas(false);
+  }
+
+  /**
+   * Item do catálogo que corresponde ao que está sendo digitado — ignorando
+   * acento e caixa, senão "cafe" viraria um item novo ao lado de "Café".
+   */
+  const itemNoCatalogo = catalogo.find((c) => mesmoNome(c.nome, draftNome));
+
+  /**
+   * Já está no catálogo → insere direto, sem perguntar nada.
+   * Não está → é item novo, e aí o checkbox decide se entra como extra.
+   */
+  const itemEhNovo = draftNome.trim().length > 0 && !itemNoCatalogo;
+
+  const sugestoes = (() => {
+    const busca = normalizarNome(draftNome);
+    if (busca.length === 0) return [];
+    // Um nome exato já resolvido não precisa continuar sugerindo.
+    if (itemNoCatalogo) return [];
+    return catalogo.filter((c) => normalizarNome(c.nome).includes(busca)).slice(0, 6);
+  })();
+
+  function escolherSugestao(nome: string) {
+    setDraftNome(nome);
+    setSugestoesAbertas(false);
+    // Item conhecido nunca é "extra" — ele já faz parte da lista comum.
+    setDraftExtra(false);
+    // Preenche o valor com o preço médio já pago por este item, quando houver
+    // histórico. Continua editável — é um ponto de partida, não um travamento.
+    const precoMedio = precoMedioPorItem[nome]?.precoMedio;
+    if (precoMedio != null && precoMedio > 0 && draftValor.trim().length === 0) {
+      setDraftValor(precoMedio.toFixed(2).replace('.', ','));
+    }
   }
 
   function inserirOuAtualizarItem() {
-    if (!draftNome.trim()) return;
+    if (!draftNome.trim()) {
+      setToastMsg('Digite o nome do item antes de inserir');
+      return;
+    }
     const novoItem = {
       nome: draftNome.trim(),
       quantidade: Number(draftQtd.replace(',', '.')) || 0,
       valorUnitario: Number(draftValor.replace(',', '.')) || 0,
-      extra: draftExtra
+      // Item já catalogado nunca é extra, mesmo que o checkbox tenha ficado
+      // marcado de uma digitação anterior.
+      extra: itemNoCatalogo ? false : draftExtra
     };
     if (editandoIndex != null) {
       update(editandoIndex, novoItem);
@@ -149,6 +267,30 @@ export function NovaCompraScreen() {
       setToastMsg(`"${novoItem.nome}" adicionado à lista`);
     }
     limparComposer();
+  }
+
+  function fecharCadastroMetodo() {
+    setCadastroMetodoAberto(false);
+    setNovoMetodoNome('');
+  }
+
+  async function salvarNovoMetodo() {
+    const nome = novoMetodoNome.trim();
+    if (!nome) {
+      setToastMsg('Digite o nome da forma de pagamento');
+      return;
+    }
+    try {
+      const inserido = await adicionarMetodoPagamento(nome);
+      setToastMsg(inserido ? `"${nome}" cadastrada` : `"${nome}" já está cadastrada`);
+      // Escolhe a forma recém-cadastrada: quem acabou de criá-la quase sempre
+      // quer usá-la nesta compra.
+      setValue('metodoPagamentoNome', nome);
+      fecharCadastroMetodo();
+    } catch (erro) {
+      console.error('Falha ao cadastrar forma de pagamento', erro);
+      setToastMsg('Não foi possível cadastrar');
+    }
   }
 
   function editarItem(index: number) {
@@ -162,30 +304,49 @@ export function NovaCompraScreen() {
   }
 
   async function onSubmit(values: NovaCompraFormValues) {
-    await salvarCompra({
-      mes: values.mes,
-      mercadoNome: values.mercadoNome,
-      itens: values.itens
-        .filter((i) => i.nome.trim().length > 0)
-        .map((i) => ({
-          nome: i.nome.trim(),
-          quantidade: Number(i.quantidade),
-          valorUnitario: Number(i.valorUnitario),
-          extra: i.extra
-        }))
-    });
+    try {
+      await salvarCompra({
+        mes: values.mes,
+        mercadoNome: values.mercadoNome,
+        metodoPagamentoNome: values.metodoPagamentoNome,
+        itens: values.itens
+          .filter((i) => i.nome.trim().length > 0)
+          .map((i) => ({
+            nome: i.nome.trim(),
+            quantidade: Number(i.quantidade),
+            valorUnitario: Number(i.valorUnitario),
+            extra: i.extra
+          }))
+      });
+    } catch (erro) {
+      // Sem isso a falha de gravação some sem rastro e o botão parece morto.
+      console.error('Falha ao salvar a compra', erro);
+      setToastMsg('Não foi possível salvar a compra — tente de novo');
+      return;
+    }
 
     const eraEdicao = editingId != null;
-    reset({ mes: currentMonthValue(), mercadoNome: '', itens: [] });
+    reset({ mes: currentMonthValue(), mercadoNome: '', metodoPagamentoNome: null, itens: [] });
     limparComposer();
     setConfirmacaoFinal(
       eraEdicao ? 'Alterações salvas!' : `Compra de ${formatBRL(total)} salva com sucesso!`
     );
   }
 
+  /**
+   * O botão "Salvar compra" fica no fim da tela e os campos com erro (mês,
+   * supermercado) no início — quem toca no botão não vê a mensagem que o
+   * formulário mostrou lá em cima. O toast repete o primeiro erro aqui embaixo.
+   */
+  function onInvalid(errosForm: typeof errors) {
+    const primeiro =
+      errosForm.mercadoNome?.message ?? errosForm.mes?.message ?? errosForm.itens?.message;
+    setToastMsg(primeiro ?? 'Confira os campos da compra');
+  }
+
   function handleCancelarEdicao() {
     cancelarEdicao();
-    reset({ mes: currentMonthValue(), mercadoNome: '', itens: [] });
+    reset({ mes: currentMonthValue(), mercadoNome: '', metodoPagamentoNome: null, itens: [] });
     limparComposer();
   }
 
@@ -193,8 +354,12 @@ export function NovaCompraScreen() {
     (Number(draftQtd.replace(',', '.')) || 0) * (Number(draftValor.replace(',', '.')) || 0);
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <ScrollView contentContainerStyle={{ padding: theme.spacing.lg, paddingBottom: 40 }}>
+    <Screen>
+      <ScrollView
+        ref={scrollRef}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ padding: theme.spacing.lg, paddingBottom: 40 }}
+      >
         <AmbientGlow color={theme.colors.primary} size={260} top={-60} left={-80} opacity={0.18} />
         <AmbientGlow color={theme.colors.accent} size={200} top={220} right={-70} opacity={0.12} />
 
@@ -271,6 +436,68 @@ export function NovaCompraScreen() {
                 onChangeText={field.onChange}
                 error={errors.mercadoNome?.message}
               />
+            )}
+          />
+          <Controller
+            control={control}
+            name="metodoPagamentoNome"
+            render={({ field }) => (
+              <View>
+                <Text style={labelStyle(theme)}>Forma de pagamento</Text>
+                <View style={styles.metodosRow}>
+                  {metodosPagamento.map((metodo) => {
+                    const ativo = field.value === metodo.nome;
+                    return (
+                      <Pressable
+                        key={metodo.id}
+                        // Tocar de novo na forma já escolhida desmarca: a
+                        // forma de pagamento é opcional.
+                        onPress={() => field.onChange(ativo ? null : metodo.nome)}
+                        style={[
+                          styles.metodoChip,
+                          {
+                            backgroundColor: ativo ? theme.colors.primary : theme.colors.surfaceAlt,
+                            borderColor: ativo ? theme.colors.primary : theme.colors.borderMuted
+                          }
+                        ]}
+                      >
+                        <Ionicons
+                          name={iconeMetodoPagamento(metodo.nome)}
+                          size={13}
+                          color={ativo ? theme.colors.onPrimary : theme.colors.textMuted}
+                        />
+                        <Text
+                          style={{
+                            fontFamily: theme.fontFamily.semiBold,
+                            fontSize: 11,
+                            color: ativo ? theme.colors.onPrimary : theme.colors.textMuted
+                          }}
+                        >
+                          {metodo.nome}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                  <Pressable
+                    onPress={() => setCadastroMetodoAberto(true)}
+                    style={[
+                      styles.metodoChip,
+                      { backgroundColor: 'transparent', borderColor: theme.colors.primary }
+                    ]}
+                  >
+                    <Ionicons name="add" size={13} color={theme.colors.primary} />
+                    <Text
+                      style={{
+                        fontFamily: theme.fontFamily.semiBold,
+                        fontSize: 11,
+                        color: theme.colors.primary
+                      }}
+                    >
+                      Nova
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
             )}
           />
         </Card>
@@ -397,6 +624,9 @@ export function NovaCompraScreen() {
         ) : null}
 
         <View
+          onLayout={(evento) => {
+            composerY.current = evento.nativeEvent.layout.y;
+          }}
           style={[
             styles.composer,
             { backgroundColor: theme.colors.surfaceAlt, borderColor: theme.colors.borderMuted }
@@ -432,8 +662,73 @@ export function NovaCompraScreen() {
           <TextField
             placeholder="Nome do item (ex: Iogurte Grego)"
             value={draftNome}
-            onChangeText={setDraftNome}
+            onFocus={revelarComposer}
+            onChangeText={(texto) => {
+              setDraftNome(texto);
+              setSugestoesAbertas(true);
+            }}
           />
+
+          {sugestoesAbertas && sugestoes.length > 0 ? (
+            <View
+              style={[
+                styles.sugestoes,
+                { backgroundColor: theme.colors.surface, borderColor: theme.colors.borderMuted }
+              ]}
+            >
+              {sugestoes.map((sugestao) => (
+                <Pressable
+                  key={sugestao.id}
+                  onPress={() => escolherSugestao(sugestao.nome)}
+                  style={styles.sugestaoLinha}
+                >
+                  <Ionicons
+                    name={getCategoriaIcon(sugestao.categoria)}
+                    size={16}
+                    color={theme.colors.primary}
+                  />
+                  <Text
+                    style={{
+                      flex: 1,
+                      fontFamily: theme.fontFamily.semiBold,
+                      fontSize: theme.type.body.fontSize,
+                      color: theme.colors.text
+                    }}
+                  >
+                    {sugestao.nome}
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: theme.fontFamily.medium,
+                      fontSize: theme.type.caption.fontSize,
+                      color: theme.colors.textFaint
+                    }}
+                  >
+                    {sugestao.categoria}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          ) : null}
+
+          {itemNoCatalogo ? (
+            <View style={styles.statusItem}>
+              <Ionicons
+                name={getCategoriaIcon(itemNoCatalogo.categoria)}
+                size={14}
+                color={theme.colors.primary}
+              />
+              <Text
+                style={{
+                  fontFamily: theme.fontFamily.medium,
+                  fontSize: theme.type.caption.fontSize,
+                  color: theme.colors.textMuted
+                }}
+              >
+                No catálogo · {itemNoCatalogo.categoria}
+              </Text>
+            </View>
+          ) : null}
           <View style={styles.composerRow}>
             <View style={[styles.composerField, { borderColor: theme.colors.borderMuted }]}>
               <Text style={{ color: theme.colors.textMuted, fontFamily: theme.fontFamily.medium }}>
@@ -461,17 +756,25 @@ export function NovaCompraScreen() {
           </View>
 
           <View style={styles.composerFooter}>
-            <Checkbox checked={draftExtra} onToggle={setDraftExtra} />
-            <Text
-              style={{
-                fontFamily: theme.fontFamily.medium,
-                fontSize: theme.type.caption.fontSize,
-                color: theme.colors.textMuted,
-                flex: 1
-              }}
-            >
-              Item extra (fora da lista comum)
-            </Text>
+            {/* O checkbox só faz sentido para item novo: o que já está no
+                catálogo entra direto na lista, sem pergunta nenhuma. */}
+            {itemEhNovo ? (
+              <>
+                <Checkbox checked={draftExtra} onToggle={setDraftExtra} />
+                <Text
+                  style={{
+                    fontFamily: theme.fontFamily.medium,
+                    fontSize: theme.type.caption.fontSize,
+                    color: theme.colors.textMuted,
+                    flex: 1
+                  }}
+                >
+                  Item novo — marcar como extra
+                </Text>
+              </>
+            ) : (
+              <View style={{ flex: 1 }} />
+            )}
             <Text
               style={{
                 fontFamily: theme.fontFamily.extraBold,
@@ -487,7 +790,6 @@ export function NovaCompraScreen() {
             label={editandoIndex != null ? 'Atualizar item' : 'Inserir na lista'}
             icon={<Ionicons name="add-circle-outline" size={17} color={theme.colors.onPrimary} />}
             onPress={inserirOuAtualizarItem}
-            disabled={!draftNome.trim()}
           />
         </View>
 
@@ -535,7 +837,7 @@ export function NovaCompraScreen() {
             </Text>
           </View>
 
-          <Pressable onPress={handleSubmit(onSubmit)}>
+          <Pressable onPress={handleSubmit(onSubmit, onInvalid)}>
             <LinearGradient
               colors={[theme.colors.primary, theme.colors.accent]}
               start={{ x: 0, y: 0 }}
@@ -558,13 +860,53 @@ export function NovaCompraScreen() {
         </View>
       </ScrollView>
 
+      <Modal
+        visible={cadastroMetodoAberto}
+        transparent
+        animationType="fade"
+        onRequestClose={fecharCadastroMetodo}
+      >
+        <View style={[styles.modalOverlay, { backgroundColor: theme.colors.overlay }]}>
+          <View
+            style={[
+              styles.modalCard,
+              { backgroundColor: theme.colors.surface, borderColor: theme.colors.borderMuted }
+            ]}
+          >
+            <Text
+              style={{
+                fontFamily: theme.fontFamily.bold,
+                fontSize: theme.type.title.fontSize,
+                color: theme.colors.text,
+                marginBottom: 10
+              }}
+            >
+              Nova forma de pagamento
+            </Text>
+            <TextField
+              placeholder="Ex: Nubank crédito"
+              value={novoMetodoNome}
+              onChangeText={setNovoMetodoNome}
+            />
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <View style={{ flex: 1 }}>
+                <Button label="Cancelar" variant="secondary" onPress={fecharCadastroMetodo} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Button label="Cadastrar" onPress={salvarNovoMetodo} />
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <Toast message={toastMsg} onHide={() => setToastMsg(null)} />
       <ConfirmModal
         visible={confirmacaoFinal != null}
         message={confirmacaoFinal ?? ''}
         onDismiss={() => setConfirmacaoFinal(null)}
       />
-    </View>
+    </Screen>
   );
 }
 
@@ -619,7 +961,40 @@ const styles = StyleSheet.create({
   composerHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   composerRow: { flexDirection: 'row', gap: 10 },
   composerField: { flex: 1 },
+  modalOverlay: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  modalCard: { width: '100%', borderRadius: 20, borderWidth: 1, padding: 20 },
+  metodosRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 4 },
+  metodoChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: 1
+  },
   composerFooter: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: -4 },
+  sugestoes: {
+    borderRadius: 12,
+    borderWidth: 1,
+    overflow: 'hidden',
+    marginTop: -6,
+    marginBottom: 10
+  },
+  sugestaoLinha: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 11
+  },
+  statusItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: -6,
+    marginBottom: 10
+  },
   summaryCard: { borderRadius: 18, borderWidth: 1, padding: 16 },
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   summaryDivider: { height: 1, marginVertical: 10 },

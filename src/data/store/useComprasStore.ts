@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 import {
   addCatalogoItem,
+  addMetodoPagamento,
   atualizarCompra,
   criarCompra,
   excluirCompra as excluirCompraDb,
@@ -9,14 +10,19 @@ import {
   getGastoPorMes,
   getPrecoMedioPorItem,
   listCatalogo,
+  listMetodosPagamento,
   listComprasComItens,
   listMercadosNomes,
   listMesesComCompras,
   removeCatalogoItem,
-  renameCatalogoItem
+  removeMetodoPagamento,
+  renameCatalogoItem,
+  renameMetodoPagamento
 } from '@/storage';
 import type {
   CatalogoItem,
+  NovoItemCompra,
+  MetodoPagamento,
   ComparativoMercado,
   CompraComItens,
   GastoPorMes,
@@ -29,12 +35,19 @@ interface ComprasState {
   inicializado: boolean;
   compras: CompraComItens[];
   catalogo: CatalogoItem[];
+  metodosPagamento: MetodoPagamento[];
   precoMedioPorItem: Record<string, PrecoMedioItem>;
   mercadosSugeridos: string[];
   mesesDisponiveis: string[];
   gastoPorMes: GastoPorMes[];
   comparativoMercados: ComparativoMercado[];
   editingId: number | null;
+  /**
+   * Compra lida de um cupom fiscal, aguardando revisão na tela de Nova
+   * Compra. Fica na store (e não em parâmetro de rota) porque a lista de
+   * itens pode ser longa demais para trafegar numa URL.
+   */
+  rascunhoCupom: RascunhoCupom | null;
   filtroMes: string | null;
   filtroMercado: string | null;
 
@@ -43,12 +56,26 @@ interface ComprasState {
   salvarCompra: (input: NovaCompraInput) => Promise<void>;
   excluirCompra: (id: number) => Promise<void>;
   iniciarEdicao: (id: number) => void;
+  definirRascunhoCupom: (rascunho: RascunhoCupom | null) => void;
   cancelarEdicao: () => void;
   setFiltroMes: (mes: string | null) => void;
   setFiltroMercado: (mercado: string | null) => void;
-  adicionarItemCatalogo: (nome: string, categoria?: string) => Promise<void>;
+  /** Resolve para `false` quando já existia um item com esse nome. */
+  adicionarItemCatalogo: (nome: string, categoria?: string) => Promise<boolean>;
+  /** Resolve para `false` quando já existia uma forma de pagamento com esse nome. */
+  adicionarMetodoPagamento: (nome: string) => Promise<boolean>;
+  renomearMetodoPagamento: (id: number, novoNome: string) => Promise<void>;
+  removerMetodoPagamento: (id: number) => Promise<void>;
   renomearItemCatalogo: (id: number, novoNome: string, categoria?: string) => Promise<void>;
   removerItemCatalogo: (id: number) => Promise<void>;
+}
+
+export interface RascunhoCupom {
+  mes: string | null;
+  mercadoNome: string | null;
+  itens: NovoItemCompra[];
+  /** Quantos itens do cupom foram reconhecidos no catálogo já cadastrado. */
+  reconhecidos: number;
 }
 
 export const useComprasStore = create<ComprasState>((set, get) => ({
@@ -56,12 +83,14 @@ export const useComprasStore = create<ComprasState>((set, get) => ({
   inicializado: false,
   compras: [],
   catalogo: [],
+  metodosPagamento: [],
   precoMedioPorItem: {},
   mercadosSugeridos: [],
   mesesDisponiveis: [],
   gastoPorMes: [],
   comparativoMercados: [],
   editingId: null,
+  rascunhoCupom: null,
   filtroMes: null,
   filtroMercado: null,
 
@@ -74,32 +103,46 @@ export const useComprasStore = create<ComprasState>((set, get) => ({
   refreshTudo: async () => {
     set({ carregando: true });
     try {
-      const { filtroMes, filtroMercado } = get();
+      // Os filtros são validados ANTES de consultar as compras. Corrigir o
+      // nome de um mercado (ou excluir a última compra de um mês) pode deixar
+      // o filtro ativo apontando para algo que não existe mais — e aí a lista
+      // viria vazia sem explicação nenhuma para quem está olhando.
+      const [mercadosSugeridos, mesesDisponiveis] = await Promise.all([
+        listMercadosNomes(),
+        listMesesComCompras()
+      ]);
+
+      const { filtroMes: mesAtual, filtroMercado: mercadoAtual } = get();
+      const filtroMes = mesAtual && mesesDisponiveis.includes(mesAtual) ? mesAtual : null;
+      const filtroMercado =
+        mercadoAtual && mercadosSugeridos.includes(mercadoAtual) ? mercadoAtual : null;
+
       const [
         compras,
         catalogo,
+        metodosPagamento,
         precoMedioPorItem,
-        mercadosSugeridos,
-        mesesDisponiveis,
         gastoPorMes,
         comparativoMercados
       ] = await Promise.all([
         listComprasComItens({ mes: filtroMes, mercadoNome: filtroMercado }),
         listCatalogo(),
+        listMetodosPagamento(),
         getPrecoMedioPorItem(),
-        listMercadosNomes(),
-        listMesesComCompras(),
         getGastoPorMes(),
         getComparativoMercados()
       ]);
       set({
         compras,
         catalogo,
+        metodosPagamento,
         precoMedioPorItem,
         mercadosSugeridos,
         mesesDisponiveis,
         gastoPorMes,
-        comparativoMercados
+        comparativoMercados,
+        filtroMes,
+        filtroMercado
       });
     } finally {
       set({ carregando: false });
@@ -123,6 +166,7 @@ export const useComprasStore = create<ComprasState>((set, get) => ({
   },
 
   iniciarEdicao: (id: number) => set({ editingId: id }),
+  definirRascunhoCupom: (rascunho: RascunhoCupom | null) => set({ rascunhoCupom: rascunho }),
   cancelarEdicao: () => set({ editingId: null }),
 
   setFiltroMes: (mes: string | null) => {
@@ -135,13 +179,28 @@ export const useComprasStore = create<ComprasState>((set, get) => ({
   },
 
   adicionarItemCatalogo: async (nome: string, categoria?: string) => {
-    await addCatalogoItem(nome, categoria);
+    const inserido = await addCatalogoItem(nome, categoria);
     await get().refreshTudo();
+    return inserido;
   },
   renomearItemCatalogo: async (id: number, novoNome: string, categoria?: string) => {
     await renameCatalogoItem(id, novoNome, categoria);
     await get().refreshTudo();
   },
+  adicionarMetodoPagamento: async (nome: string) => {
+    const inserido = await addMetodoPagamento(nome);
+    await get().refreshTudo();
+    return inserido;
+  },
+  renomearMetodoPagamento: async (id: number, novoNome: string) => {
+    await renameMetodoPagamento(id, novoNome);
+    await get().refreshTudo();
+  },
+  removerMetodoPagamento: async (id: number) => {
+    await removeMetodoPagamento(id);
+    await get().refreshTudo();
+  },
+
   removerItemCatalogo: async (id: number) => {
     await removeCatalogoItem(id);
     await get().refreshTudo();
