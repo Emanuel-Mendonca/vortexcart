@@ -1,135 +1,145 @@
+<div align="center">
+
+<img src="docs/screenshots/vortex-icon.png" alt="Vortex Cart" width="96">
+
 # Vortex Cart
 
-<p align="center">
-  <em>App mobile para registrar suas compras de mercado, item por item, e descobrir em qual supermercado o seu dinheiro rende mais.</em>
-</p>
+**Registre suas compras de mercado item por item e descubra em qual supermercado o seu dinheiro rende mais.**
 
-<p align="center">
-  <img alt="Expo SDK" src="https://img.shields.io/badge/Expo-SDK%2051-000020?logo=expo&logoColor=white">
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white">
-  <img alt="License" src="https://img.shields.io/badge/license-MIT-625788">
-  <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-D3C87C">
-</p>
+Leia o QR Code do cupom fiscal e a compra se preenche sozinha.
+
+<img alt="Expo SDK 57" src="https://img.shields.io/badge/Expo-SDK%2057-000020?logo=expo&logoColor=white">
+<img alt="React Native 0.86" src="https://img.shields.io/badge/React%20Native-0.86-61DAFB?logo=react&logoColor=white">
+<img alt="TypeScript strict" src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white">
+<img alt="Licença MIT" src="https://img.shields.io/badge/license-MIT-625788">
+
+</div>
 
 ---
 
-## Sobre
+## Telas
 
-O Vortex Cart nasceu de uma planilha Excel usada para acompanhar os gastos do mercado de casa (o mesmo conceito por trás do "Controle da Compra", a versão web deste projeto). Este app é a versão mobile nativa dessa ideia: registra o que foi comprado, em qual mercado, por quanto — e ajuda a enxergar em qual supermercado o dinheiro rende mais, mês a mês.
+<div align="center">
 
-100% offline: os dados ficam no seu aparelho, em um banco SQLite local. Nada é enviado para servidor nenhum.
+|                                         Nova Compra                                         |                                          Histórico                                          |
+| :-----------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------: |
+| <img src="docs/screenshots/1_nova_compra.png" alt="Tela de registro de compra" width="250"> | <img src="docs/screenshots/2_historico.png" alt="Tela de histórico de compras" width="250"> |
+|                          Mês, mercado, forma de pagamento e itens                           |                       Compras agrupadas por mês, com busca e filtros                        |
 
-## Capturas de tela
+|                                        Resumo                                        |                                        Itens                                         |
+| :----------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------: |
+| <img src="docs/screenshots/3_resumo.png" alt="Tela de resumo de gastos" width="250"> | <img src="docs/screenshots/4_itens.png" alt="Tela do catálogo de itens" width="250"> |
+|                     Gasto por mês e comparação de supermercados                      |                   Catálogo por departamento e formas de pagamento                    |
 
-| Nova Compra                                                                       | Histórico                                                                     |
-| --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| <img src="docs/screenshots/1_nova_compra.png" alt="Tela Nova Compra" width="240"> | <img src="docs/screenshots/2_historico.png" alt="Tela Histórico" width="240"> |
+</div>
 
-| Resumo                                                                  | Itens                                                                 |
-| ----------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| <img src="docs/screenshots/3_resumo.png" alt="Tela Resumo" width="240"> | <img src="docs/screenshots/4_itens.png" alt="Tela Itens" width="240"> |
+## O que ele faz
 
-## Funcionalidades
+**Leitura do cupom fiscal por QR Code.** Aponte a câmera para o QR Code da nota (NFC-e,
+Minas Gerais) e os itens entram na compra automaticamente, com nome, quantidade e valor. Itens
+que já estão no seu catálogo são reconhecidos pelo nome cadastrado, em vez de criar
+duplicatas.
 
-- **Nova Compra** — registra mês, supermercado e itens (nome, quantidade, valor unitário), com subtotal e total calculados automaticamente.
-- **Histórico** — compras agrupadas por mês, com filtro por mês/mercado, edição e exclusão.
-- **Resumo** — gasto total por mês (gráfico de barras) e ranking de supermercados pelo valor médio por compra, com selo de "mais econômico".
-- **Itens** — catálogo de produtos usados como sugestão automática ao registrar uma compra.
-- **Exportação** — JSON (backup completo), CSV (para planilhas) e PDF (relatório), todos com compartilhamento nativo do sistema.
-- **Importação** — restaura um backup JSON, somando aos dados existentes (não substitui nem apaga nada).
-- **Tema claro/escuro** — segue a preferência do sistema.
+**Registro manual, quando preferir.** Mês, supermercado, forma de pagamento e itens. Ao
+digitar um item, o app sugere o que já existe no catálogo e preenche o valor com o preço
+médio que você já pagou por ele.
+
+**Histórico completo.** Compras agrupadas por mês, com busca por mercado ou produto,
+filtros por período e por comércio, edição e exclusão.
+
+**Comparação de supermercados.** Gasto por mês em gráfico, e o ranking dos mercados pelo
+valor médio por compra, com selo para o mais econômico.
+
+**Catálogo em 15 departamentos.** Padaria, Hortifruti, Frios e Laticínios, Carnes,
+Limpeza e mais. Cada item guarda o preço médio, calculado do seu próprio histórico.
+
+**Formas de pagamento cadastráveis.** Cartão de débito, crédito e vale refeição já vêm
+prontos; você pode cadastrar outras.
+
+**Backup em JSON, CSV ou PDF.** A importação de JSON soma aos dados existentes, sem
+substituir nem apagar nada.
+
+**Tema claro e escuro**, seguindo a preferência do sistema.
+
+## Privacidade
+
+Tudo é gravado em um banco SQLite no próprio aparelho. Não há conta, servidor nem
+rastreador, e nenhum dado de compra sai do celular.
+
+A **única** funcionalidade que usa internet é a leitura do cupom fiscal: ela abre o portal
+da SEFAZ-MG para consultar a nota que você escaneou. O acesso é ao portal do governo, com
+a chave impressa no seu próprio cupom.
 
 ## Tecnologias
 
-| Camada       | Escolha                                                          | Por quê (resumo — detalhes em [ARCHITECTURE.md](./docs/projeto/ARCHITECTURE.md)) |
-| ------------ | ---------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| Framework    | React Native + Expo (SDK 51)                                     | Managed workflow, sem necessidade de configuração nativa manual                  |
-| Linguagem    | TypeScript (strict)                                              | Segurança de tipos em todo o domínio de dados                                    |
-| Navegação    | Expo Router                                                      | Roteamento baseado em arquivos, menos boilerplate                                |
-| Estado       | Zustand                                                          | Simples e suficiente para um app 100% offline (sem cache de servidor)            |
-| Persistência | expo-sqlite                                                      | Consultas relacionais (SUM/AVG/GROUP BY) para os relatórios de gasto             |
-| Formulários  | React Hook Form + Zod                                            | Validação tipada e performática                                                  |
-| Exportação   | expo-file-system, expo-sharing, expo-print, expo-document-picker | Geração e compartilhamento de JSON/CSV/PDF, e importação de backup               |
-| Qualidade    | ESLint, Prettier, Husky, lint-staged, Commitlint                 | Consistência de código e commits                                                 |
+| Camada       | Escolha                                    | Por quê                                             |
+| ------------ | ------------------------------------------ | --------------------------------------------------- |
+| Framework    | React Native + Expo (SDK 57)               | Managed workflow, sem configuração nativa manual    |
+| Linguagem    | TypeScript strict                          | Segurança de tipos em todo o domínio                |
+| Navegação    | Expo Router                                | Roteamento por arquivos, menos boilerplate          |
+| Estado       | Zustand                                    | Suficiente para um app local, sem cache de servidor |
+| Persistência | expo-sqlite                                | `SUM`/`AVG`/`GROUP BY` para os relatórios de gasto  |
+| Formulários  | React Hook Form + Zod                      | Validação tipada                                    |
+| Cupom fiscal | expo-camera + react-native-webview         | Leitura do QR Code e consulta ao portal             |
+| Backup       | expo-file-system, expo-sharing, expo-print | JSON, CSV e PDF                                     |
+| Qualidade    | ESLint, Prettier, Husky, Commitlint, Jest  | Consistência e testes automáticos                   |
 
-## Instalação
+O raciocínio por trás de cada escolha está em
+[ARCHITECTURE.md](docs/projeto/ARCHITECTURE.md).
 
-Pré-requisitos: Node.js 18+, npm, Git, e o app **Expo Go** no celular (ou um emulador Android/simulador iOS configurado).
+## Começando
 
 ```bash
 git clone https://github.com/Emanuel-Mendonca/vortexcart.git
-cd vortex-cart
+cd vortexcart
 npm install
 ```
-
-## Como executar
 
 ```bash
 npx expo start
 ```
 
-Escaneie o QR code com o Expo Go (Android) ou a câmera (iOS), ou pressione `a`/`i`/`w` no terminal para abrir no emulador Android, simulador iOS, ou navegador.
+Escaneie o QR code com o **Expo Go** (compatível com SDK 57). Para gerar um APK instalável
+sem depender do Expo Go, veja o [GUIA.md](docs/projeto/GUIA.md).
 
-Guia completo, incluindo Git e GitHub, em [IMPLEMENTACAO.md](./docs/projeto/IMPLEMENTACAO.md). Para subir o
-projeto para o GitHub em commits organizados, publicar a landing page e gerar um build
-instalável (sem depender do Expo Go), veja [PUBLICACAO.md](./docs/projeto/PUBLICACAO.md).
-
-## Estrutura do projeto
+## Estrutura
 
 ```
-app/              rotas (Expo Router) — cada arquivo só renderiza uma tela
+app/          rotas (Expo Router), cada arquivo só renderiza uma tela
 
 src/
-  ui/             tudo que o usuário vê
-    components/     componentes reutilizáveis (Button, Card, Screen...)
-    screens/        as telas do app
-    theme/          design tokens e tema claro/escuro
-    assets/         ícone, splash e favicon
-
-  data/           estado e persistência
-    storage/        camada SQLite (schema, migrações, repositórios)
-    store/          estado global (Zustand)
-    types/          contratos de dados do domínio
-
-  services/       I/O com o mundo de fora
-    nfce/           leitura do cupom fiscal (QR Code + portal SEFAZ-MG)
-    export/import   backup em JSON, CSV e PDF
-
-  shared/         código puro, sem dependência de UI nem de banco
-    utils/          moeda, datas, texto, totais, validação (Zod)
-    constants/      catálogo inicial, departamentos, nome do banco
+  ui/         componentes, telas, tema e assets
+  data/       SQLite, store (Zustand) e tipos de domínio
+  services/   leitura de cupom fiscal e backup, o I/O externo
+  shared/     funções puras e constantes, sem dependência de UI nem de banco
 
 docs/
-  projeto/        documentação técnica (arquitetura, roadmap, backlog...)
-  index.html      landing page publicada no GitHub Pages
+  projeto/    documentação técnica
+  index.html  landing page publicada no GitHub Pages
 ```
 
-Detalhes de arquitetura e decisões técnicas em [ARCHITECTURE.md](./docs/projeto/ARCHITECTURE.md).
+A dependência só desce: `ui` conhece `data`, `data` conhece `shared`, e `shared` não conhece
+ninguém. É por isso que quase toda a cobertura de testes vive em `shared/`.
 
-## Identidade de marca
+## Documentação
 
-Nome, conceito do símbolo, paleta e variações do logo em [BRANDING.md](./docs/projeto/BRANDING.md).
+| Documento                                       | Conteúdo                                    |
+| ----------------------------------------------- | ------------------------------------------- |
+| [ARCHITECTURE.md](docs/projeto/ARCHITECTURE.md) | Camadas, fluxo de dados e decisões técnicas |
+| [ROADMAP.md](docs/projeto/ROADMAP.md)           | O que já foi entregue e o que vem a seguir  |
+| [BRANDING.md](docs/projeto/BRANDING.md)         | Nome, símbolo, paleta e variações do logo   |
+| [GUIA.md](docs/projeto/GUIA.md)                 | Rodar, gerar APK e publicar                 |
+| [CONTRIBUTING.md](.github/CONTRIBUTING.md)      | Fluxo, convenções de código e testes        |
+| [CHANGELOG.md](CHANGELOG.md)                    | Histórico de mudanças                       |
 
-## Roadmap
+## Contribuindo
 
-Veja o plano completo (MVP → V1 → V2 → V3) em [ROADMAP.md](./docs/projeto/ROADMAP.md) e o backlog priorizado (MoSCoW) em [BACKLOG.md](./docs/projeto/BACKLOG.md).
+Contribuições são bem-vindas. Leia o [CONTRIBUTING.md](.github/CONTRIBUTING.md) e o
+[CODE_OF_CONDUCT.md](.github/CODE_OF_CONDUCT.md) antes de começar.
 
-## Como contribuir
-
-Contribuições são bem-vindas! Leia o [CONTRIBUTING.md](./.github/CONTRIBUTING.md) para o fluxo de branches, padrão de commits e checklist de qualidade, e o [CODE_OF_CONDUCT.md](./.github/CODE_OF_CONDUCT.md) antes de participar.
-
-## Segurança
-
-Para reportar uma vulnerabilidade, siga as instruções em [SECURITY.md](./.github/SECURITY.md) — não abra uma issue pública.
+Para reportar uma vulnerabilidade, siga o [SECURITY.md](.github/SECURITY.md), não abra
+issue pública.
 
 ## Licença
 
-Distribuído sob a licença MIT — veja [LICENSE](./LICENSE).
-
-## Autores
-
-- Você! (preencha aqui quando publicar)
-
-## Agradecimentos
-
-- À comunidade Expo/React Native pela documentação e ferramentas open source usadas neste projeto.
+MIT, veja [LICENSE](LICENSE).

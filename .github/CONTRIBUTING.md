@@ -1,25 +1,24 @@
-# Contribuindo com o Controle da Compra
+# Contribuindo com o Vortex Cart
 
-Obrigado pelo interesse em contribuir! Este documento explica o fluxo esperado.
+Obrigado pelo interesse! Este documento reúne o fluxo de trabalho, as convenções de código
+e o que se espera de teste antes de um Pull Request.
 
 ## Antes de começar
 
-1. Verifique se já não existe uma issue ou PR sobre o que você quer fazer.
-2. Para mudanças grandes, abra uma issue primeiro para alinhar a abordagem antes de codar.
+1. Verifique se já não existe issue ou PR sobre o que você quer fazer.
+2. Para mudanças grandes, abra uma issue primeiro para alinhar a abordagem.
 3. Leia o [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
 
-## Ambiente de desenvolvimento
-
-Siga o [IMPLEMENTACAO.md](../docs/projeto/IMPLEMENTACAO.md) para instalar dependências e rodar o projeto localmente.
+Para instalar e rodar o projeto, veja o [GUIA.md](../docs/projeto/GUIA.md).
 
 ## Fluxo de branches
 
-Usamos um Git Flow simplificado (detalhado no `IMPLEMENTACAO.md`, seção 8):
+Git Flow simplificado:
 
-- `main` — estável, nunca recebe commit direto.
-- `develop` — integração das features.
-- `feature/<nome>`, `fix/<nome>` — a partir de `develop`.
-- `hotfix/<nome>` — a partir de `main`, para correções urgentes.
+- `main`, estável, nunca recebe commit direto
+- `develop`, integração das features
+- `feature/<nome>`, `fix/<nome>`, a partir de `develop`
+- `hotfix/<nome>`, a partir de `main`, para correção urgente
 
 ```bash
 git checkout develop
@@ -29,53 +28,142 @@ git checkout -b feature/minha-mudanca
 
 ## Padrão de commits
 
-Este repositório usa [Conventional Commits](https://www.conventionalcommits.org/), validado automaticamente pelo Husky + Commitlint a cada commit:
+[Conventional Commits](https://www.conventionalcommits.org/), validado pelo Husky +
+Commitlint a cada commit:
 
 ```
 feat(escopo): descrição no imperativo
 fix(escopo): descrição no imperativo
 docs: descrição
-chore: descrição
 ```
 
-Tipos aceitos: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
+Tipos aceitos: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`,
+`chore`, `revert`.
+
+---
+
+# Convenções de código
+
+## Linguagem: português no domínio, inglês no genérico
+
+- **Domínio do app** (específico deste produto): português, `criarCompra`,
+  `useComprasStore`, `ComparativoMercado`.
+- **Genérico** (poderia existir em qualquer app React Native): inglês, `Button`,
+  `TextField`, `formatBRL`.
+- Comentários e documentação: português.
+- Branches, commits e arquivos de configuração: inglês, por convenção do ecossistema.
+
+## Camadas
+
+O `src/` é dividido em quatro camadas e **a dependência só desce**:
+
+```
+ui/       → data/ → shared/
+services/ → data/ → shared/
+```
+
+Se algo em `shared/` importar de `ui/`, é erro de camada. Detalhes em
+[ARCHITECTURE.md](../docs/projeto/ARCHITECTURE.md).
+
+## TypeScript
+
+- `strict: true` sempre. Evite `any`; se for inevitável, comente o porquê.
+- `type` para uniões e formas simples; `interface` para objetos extensíveis.
+- Funções exportadas de `data/storage/` e `services/` sempre com tipo de retorno explícito.
+- `import type { X }` para importar só tipos (o ESLint avisa).
+
+## Componentes React
+
+- Componentes de `ui/components/` não acessam a store nem os repositórios, recebem tudo
+  por props.
+- Funções com hooks; sem classes.
+- Um componente por arquivo, nome do arquivo igual ao do componente.
+- **Nunca** cor, espaçamento ou fonte fixos no componente. Tudo vem de
+  `ui/theme/tokens.ts` via `getTheme(scheme)`, é isso que faz o tema claro/escuro
+  funcionar de graça. Se o valor não existe nos tokens, adicione-o lá primeiro.
+
+## Nomenclatura de arquivos
+
+| Tipo               | Convenção                | Exemplo                |
+| ------------------ | ------------------------ | ---------------------- |
+| Componente         | PascalCase               | `MonthPicker.tsx`      |
+| Tela               | PascalCase + `Screen`    | `NovaCompraScreen.tsx` |
+| Repositório        | camelCase + `Repository` | `comprasRepository.ts` |
+| Hook               | `use` + PascalCase       | `useComprasStore.ts`   |
+| Utilitário         | camelCase                | `currency.ts`          |
+| Rota (Expo Router) | minúsculo, reflete a URL | `historico.tsx`        |
+
+Prettier e ESLint resolvem o resto do estilo (`npm run lint:fix`).
+
+---
+
+# Testes
+
+## Estratégia
+
+**Jest** + **jest-expo**, com React Native Testing Library para componentes.
+
+1. **Unitários** (maior volume), funções puras de `src/shared/`: moeda, datas, texto,
+   totais, validação, e os interpretadores de cupom fiscal.
+2. **Integração**, a store operando contra SQLite real, cobrindo criar → listar → editar →
+   excluir e as agregações refletindo a mudança.
+3. **Componente** (menor volume, mais caros de manter), interação de tela.
+
+Não há testes end-to-end previstos por enquanto.
+
+## O que tem prioridade
+
+| Área                                       | Por quê                                       |
+| ------------------------------------------ | --------------------------------------------- |
+| `calcularTotal` e subtotais                | erro aqui é silencioso e financeiro           |
+| `getComparativoMercados`, `getGastoPorMes` | agregação SQL quebra fácil numa migração      |
+| `novaCompraFormSchema` (Zod)               | impede dado inválido de chegar ao banco       |
+| Importação de backup                       | arquivo malformado não pode corromper o banco |
+| Interpretação do cupom fiscal              | depende de HTML de terceiro; quebra sem aviso |
+| `monthLabel`, `parseMonthValue`            | bug aqui quebra filtros e exibição em cascata |
+
+## Convenções
+
+- Teste ao lado do código: `arquivo.ts` → `arquivo.test.ts`.
+- Testes de banco usam `resetDbInstanceForTests()` no `beforeEach` para isolar cada caso.
+- Sem mock do `expo-sqlite`: testamos contra o banco real. Mais lento, porém confiável para
+  uma camada de persistência.
+
+---
 
 ## Antes de abrir o Pull Request
 
-Rode localmente:
+Rode localmente e confirme que passam:
 
 ```bash
 npm run lint
+```
+
+```bash
 npm run typecheck
-npm run format:check
+```
+
+```bash
 npm test
 ```
 
-O `pre-commit` hook já roda lint + format nos arquivos alterados automaticamente, mas rodar tudo manualmente antes do PR evita surpresas.
+### Checklist
 
-### Checklist de qualidade (Definition of Done)
-
-Antes de marcar uma funcionalidade como concluída, confira:
-
-- [ ] O código segue os padrões do [STYLEGUIDE.md](../docs/projeto/STYLEGUIDE.md)
-- [ ] Tipos TypeScript sem `any` desnecessário (`npm run typecheck` passa)
-- [ ] ESLint e Prettier sem erros (`npm run lint` e `npm run format:check` passam)
-- [ ] Testes relevantes adicionados/atualizados — veja o [TESTPLAN.md](../docs/projeto/TESTPLAN.md)
-- [ ] Testado manualmente em pelo menos uma plataforma (Android, iOS ou web)
-- [ ] Nenhuma sensação de "quebra" visual nos temas claro e escuro
-- [ ] Commits seguem Conventional Commits
-- [ ] `CHANGELOG.md` atualizado, se a mudança for visível ao usuário
+- [ ] Caminho feliz coberto por teste automatizado
+- [ ] Pelo menos um caso de borda coberto (valor negativo, campo vazio, arquivo inválido)
+- [ ] `lint` e `typecheck` sem aviso novo
+- [ ] **Testado em aparelho ou emulador**, compilar não é o mesmo que funcionar
+- [ ] Testado nos temas claro e escuro
+- [ ] Sem `console.log` esquecido (permitidos `console.warn` e `console.error`)
+- [ ] Documentação atualizada quando a mudança afeta estrutura ou comportamento
+- [ ] `CHANGELOG.md` atualizado na seção `[Não lançado]`
 
 ## Abrindo o Pull Request
 
-- Use o template de PR (preenchido automaticamente).
-- Descreva o "porquê", não só o "o quê" — links para a issue relacionada ajudam.
-- PRs pequenos e focados são revisados mais rápido que PRs grandes e genéricos.
+Descreva **o que** muda e **por quê**, e inclua captura de tela quando a mudança for visual.
+O template de PR já traz a estrutura esperada.
 
 ## Reportando bugs ou sugerindo funcionalidades
 
-Use os templates de issue disponíveis ao clicar em "New Issue" no GitHub (bug report ou feature request).
-
-## Dúvidas
-
-Veja o [SUPPORT.md](./SUPPORT.md) para onde perguntar.
+Use os templates de issue. Para bug, inclua passos para reproduzir, o que esperava e o que
+aconteceu. Dúvidas: veja [SUPPORT.md](./SUPPORT.md).

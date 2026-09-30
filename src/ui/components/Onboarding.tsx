@@ -23,7 +23,7 @@ import { PassoDados } from './onboarding/PassoDados';
  *
  * Toda afirmação aqui descreve algo que o app realmente faz. O mockup de
  * referência trazia "Inteligência Preditiva", "Órbita Quântica · Previsão em
- * tempo real" e valores de economia — recursos que não existem no código.
+ * tempo real" e valores de economia, recursos que não existem no código.
  * Além de serem falsos, no primeiro uso o banco está vazio: não haveria
  * número real nenhum para exibir. Isso segue a mesma regra registrada no
  * CHANGELOG desde o redesign: nenhuma métrica fabricada.
@@ -127,7 +127,7 @@ const PASSOS: readonly Passo[] = [
     selo: { icone: 'shield-checkmark-outline', texto: 'Privacidade por padrão' },
     titulo: 'Seus dados ficam com você',
     texto:
-      'Tudo é gravado num banco local no próprio aparelho — sem conta, sem servidor, sem rastreador. Quando quiser, exporte um backup em JSON, CSV ou PDF.',
+      'Tudo é gravado num banco local no próprio aparelho, sem conta, sem servidor, sem rastreador. Quando quiser, exporte um backup em JSON, CSV ou PDF.',
     iconeCentral: 'analytics',
     rotuloCentral: 'Resumo',
     badges: [

@@ -9,7 +9,7 @@ import { formatBRL } from '@/utils/currency';
  *
  * Os números são um **exemplo** e estão marcados como tal: na primeira
  * abertura o banco está vazio, então não há dado real a exibir. O que a
- * ilustração mostra — média por compra e selo de mais econômico — é
+ * ilustração mostra, média por compra e selo de mais econômico, é
  * exatamente o que o app calcula de verdade (`getComparativoMercados`).
  *
  * O mockup de referência trazia "economia de ~18.4%", "-24%" por produto,
@@ -40,7 +40,7 @@ const COMPARADO: MercadoExemplo = {
   totalGasto: 1087.48
 };
 
-/** Preço médio por item, calculado do histórico — o que o catálogo exibe. */
+/** Preço médio por item, calculado do histórico, o que o catálogo exibe. */
 const ITENS_EXEMPLO = [
   { nome: 'Café', preco: 18.9 },
   { nome: 'Arroz', preco: 27.9 },

@@ -59,7 +59,7 @@ export function HistoricoScreen() {
 
   /**
    * Atalhos para os períodos mais consultados. Só aparecem quando existe
-   * compra no período — oferecer "Mês passado" sem dado nenhum leva a uma
+   * compra no período, oferecer "Mês passado" sem dado nenhum leva a uma
    * lista vazia e à impressão de que o filtro quebrou.
    */
   const atalhosPeriodo = useMemo(() => {
@@ -74,7 +74,7 @@ export function HistoricoScreen() {
     return candidatos.filter((c) => mesesDisponiveis.includes(c.mes));
   }, [mesesDisponiveis]);
 
-  /** Meses agrupados por ano — uma lista corrida vira um paredão de chips. */
+  /** Meses agrupados por ano, uma lista corrida vira um paredão de chips. */
   const mesesPorAno = useMemo(() => {
     const mapa = new Map<string, string[]>();
     for (const mes of mesesDisponiveis) {
@@ -441,7 +441,7 @@ export function HistoricoScreen() {
   );
 }
 
-/** "setembro de 2026" -> "Set" — dentro do grupo do ano, o ano é redundante. */
+/** "setembro de 2026" -> "Set", dentro do grupo do ano, o ano é redundante. */
 function rotuloMesCurto(mes: string): string {
   const completo = monthLabel(mes);
   const nome = completo.split(' de ')[0] ?? completo;

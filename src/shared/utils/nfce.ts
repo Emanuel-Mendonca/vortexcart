@@ -1,7 +1,7 @@
 /**
  * Leitura do QR Code da NFC-e (cupom fiscal eletrônico).
  *
- * O QR **não contém os itens da compra** — apenas a chave de acesso e dados
+ * O QR **não contém os itens da compra**, apenas a chave de acesso e dados
  * de autenticação. Os itens só existem na página da SEFAZ, e é por isso que
  * o fluxo do app abre o portal em seguida (ver `src/services/nfce/`).
  *
@@ -9,7 +9,7 @@
  *   https://<portal>/qrcode.xhtml?p=<chave>|<versao>|<ambiente>|<idCSC>|<hash>
  *
  * Em emissão offline/contingência entram dois campos a mais (dia da emissão
- * e valor total) antes do idCSC — por isso lemos os campos por posição
+ * e valor total) antes do idCSC, por isso lemos os campos por posição
  * apenas até a chave, que é a única garantida em todas as variantes.
  */
 

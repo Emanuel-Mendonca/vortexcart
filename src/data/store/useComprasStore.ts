@@ -105,7 +105,7 @@ export const useComprasStore = create<ComprasState>((set, get) => ({
     try {
       // Os filtros são validados ANTES de consultar as compras. Corrigir o
       // nome de um mercado (ou excluir a última compra de um mês) pode deixar
-      // o filtro ativo apontando para algo que não existe mais — e aí a lista
+      // o filtro ativo apontando para algo que não existe mais, e aí a lista
       // viria vazia sem explicação nenhuma para quem está olhando.
       const [mercadosSugeridos, mesesDisponiveis] = await Promise.all([
         listMercadosNomes(),

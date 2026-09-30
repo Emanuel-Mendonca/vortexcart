@@ -24,7 +24,7 @@ type Operacao = 'json' | 'csv' | 'pdf' | 'importar' | null;
 /** Altura útil da área das barras (sem os rótulos dos meses). */
 const CHART_HEIGHT = 130;
 /**
- * Espaço reservado acima da barra mais alta — cabe o balão com o valor
+ * Espaço reservado acima da barra mais alta, cabe o balão com o valor
  * (`tooltip`, top: -22) e a barra não encosta no cabeçalho do card.
  */
 const CHART_HEADROOM = 28;
@@ -34,7 +34,7 @@ const CHART_MIN_BAR = 6;
 const CHART_COL = 48;
 
 /**
- * Altura da barra em px — a MESMA função alimenta a barra e o ponto da linha,
+ * Altura da barra em px, a MESMA função alimenta a barra e o ponto da linha,
  * para que a linha tracejada toque exatamente o topo de cada barra.
  */
 function alturaBarra(total: number, maxMes: number): number {
@@ -228,7 +228,7 @@ export function ResumoScreen() {
           ) : (
             <>
               {/* A área das barras e o SVG têm exatamente a mesma altura
-                  (CHART_HEIGHT), e os rótulos ficam FORA dela — assim o
+                  (CHART_HEIGHT), e os rótulos ficam FORA dela, assim o
                   viewBox não é esticado e a linha cai onde a barra termina. */}
               <View style={styles.chartArea}>
                 <Svg
@@ -361,7 +361,7 @@ export function ResumoScreen() {
                     {formatBRL(m.mediaPorCompra)}
                   </Text>
                 </View>
-                {/* O selo ganha linha própria — ao lado do nome, ele competia
+                {/* O selo ganha linha própria, ao lado do nome, ele competia
                     pelo mesmo espaço e sobrepunha o valor. */}
                 {index === 0 && comparativoMercados.length > 1 ? (
                   <View style={{ alignSelf: 'flex-start', marginTop: 6 }}>

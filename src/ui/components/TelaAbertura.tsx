@@ -9,7 +9,7 @@ import { AmbientGlow } from './AmbientGlow';
 
 /**
  * Etapas reais da inicialização do app. Cada uma corresponde a algo que de
- * fato acontece em `app/_layout.tsx` — não são mensagens decorativas.
+ * fato acontece em `app/_layout.tsx`, não são mensagens decorativas.
  */
 export type EtapaAbertura = 'fontes' | 'banco' | 'dados' | 'pronto';
 
@@ -29,13 +29,13 @@ interface TelaAberturaProps {
 /**
  * Tela de abertura animada, exibida enquanto fontes e banco carregam.
  *
- * O anel orbital girando é o próprio símbolo da marca (ver BRANDING.md) — a
+ * O anel orbital girando é o próprio símbolo da marca (ver BRANDING.md), a
  * animação existe para reforçar a identidade, não como enfeite solto.
  *
  * O rodapé mostra **estado real de carregamento** e a versão vinda do
  * `app.config.ts`. A referência de design trazia um console fictício
  * ("QUANTUM CORE", "verificando chaves de cofre quântico", "atualizando
- * taxas de câmbio") — o app não faz nada disso, e exibir número inventado
+ * taxas de câmbio"), o app não faz nada disso, e exibir número inventado
  * contraria a regra que o projeto segue desde o redesign: toda métrica
  * mostrada vem de dado real.
  */
@@ -150,7 +150,7 @@ export function TelaAbertura({ etapa, versao }: TelaAberturaProps) {
             </Svg>
           </Animated.View>
 
-          {/* Anel interno, em sentido contrário — reforça a ideia de vórtice */}
+          {/* Anel interno, em sentido contrário, reforça a ideia de vórtice */}
           <Animated.View style={[styles.anel, { transform: [{ rotate: rotacaoInversa }] }]}>
             <Svg height={230} width={230} viewBox="0 0 260 260">
               <Circle

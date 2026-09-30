@@ -17,7 +17,7 @@ interface SeletorCategoriaProps {
  *
  * Mostrar os 15 departamentos como chips ocupava meia tela e competia com o
  * conteúdo. Aqui o campo exibe apenas o escolhido e abre a lista sob demanda
- * — o custo é um toque a mais, e o ganho é a tela respirar.
+ *, o custo é um toque a mais, e o ganho é a tela respirar.
  */
 export function SeletorCategoria({ label, categorias, valor, onChange }: SeletorCategoriaProps) {
   const scheme = useColorScheme();

@@ -1,8 +1,8 @@
 /* ===================================================================
-   Vortex Cart — landing page (docs/index.html)
+   Vortex Cart, landing page (docs/index.html)
    -------------------------------------------------------------------
    Paleta e tipografia espelham src/theme/tokens.ts (tema escuro).
-   Se um token mudar lá, atualize aqui também — ver BRANDING.md.
+   Se um token mudar lá, atualize aqui também, ver BRANDING.md.
 
    Sumário
      1. Tokens e base
@@ -78,7 +78,7 @@ h3 {
   font-size: 18px;
 }
 
-/* Glows atmosféricos de fundo — mesma ideia do componente AmbientGlow do
+/* Glows atmosféricos de fundo, mesma ideia do componente AmbientGlow do
    app. Posição e cor de cada um ficam nos modificadores .glow--1/2/3. */
 .glow {
   position: absolute;
@@ -282,7 +282,7 @@ nav a:hover {
   backdrop-filter: blur(10px);
 }
 
-/* Moldura do celular com os anéis orbitais girando — representação direta
+/* Moldura do celular com os anéis orbitais girando, representação direta
    do símbolo da marca (ver BRANDING.md). */
 .orbit-frame {
   position: relative;

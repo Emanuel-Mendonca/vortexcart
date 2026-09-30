@@ -142,7 +142,7 @@ function buildPdfHtml(compras: CompraComItens[]): string {
         .join('');
 
       return `
-        <h2>${monthLabel(mes)} — total ${formatBRL(totalMes)}</h2>
+        <h2>${monthLabel(mes)}, total ${formatBRL(totalMes)}</h2>
         <table>
           <thead>
             <tr><th></th><th>Item</th><th>Qtd</th><th>Valor</th></tr>
@@ -170,7 +170,7 @@ function buildPdfHtml(compras: CompraComItens[]): string {
         </style>
       </head>
       <body>
-        <h1>Vortex Cart — Relatório de Compras</h1>
+        <h1>Vortex Cart, Relatório de Compras</h1>
         <div class="subtitulo">Gerado em ${new Date().toLocaleString('pt-BR')}</div>
         ${blocosMes}
         <div class="total-geral">Total geral: ${formatBRL(totalGeral)}</div>

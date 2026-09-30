@@ -1,55 +1,84 @@
 # Roadmap
 
-Este roadmap organiza o projeto em marcos incrementais. Cada marco deve ser utilizável
-sozinho — não dependemos de "terminar tudo" para ter valor entregue.
+Marcos incrementais, cada um utilizável sozinho, não dependemos de "terminar tudo" para
+ter valor entregue. A prioridade de cada item pendente está marcada como
+**Must** (bloqueia o marco), **Should** (importante, não bloqueia) ou **Could** (se sobrar
+tempo).
 
-## MVP — mínimo utilizável (Fases 1 a 3, já entregues)
+## MVP, entregue
 
-Objetivo: alguém consegue registrar compras reais e ver se está economizando.
+Alguém consegue registrar compras reais e ver onde está economizando.
 
-- [x] Registrar compra (mês, mercado, itens, quantidade, valor unitário)
+- [x] Registrar compra: mês, mercado, itens com quantidade e valor
 - [x] Histórico com edição e exclusão
-- [x] Resumo: gasto por mês + comparação de supermercados
+- [x] Resumo: gasto por mês e comparação de supermercados
 - [x] Catálogo de itens com sugestão automática
-- [x] Persistência local (SQLite), 100% offline
-- [x] Exportar dados (JSON/CSV/PDF) e importar backup
+- [x] Persistência local em SQLite
+- [x] Exportar em JSON, CSV e PDF; importar backup JSON
 
-## V1 — pronto para uso diário e para portfólio (Fases 4 a 6)
+## V1, uso diário e portfólio
 
-Objetivo: o projeto é publicável no GitHub como peça de portfólio e confortável de usar no
-dia a dia.
+- [x] Documentação open source completa
+- [x] CI/CD: lint, typecheck e testes a cada push/PR
+- [x] Identidade de marca: nome, logo e ícone (ver [BRANDING.md](./BRANDING.md))
+- [x] Build de teste configurado (`eas.json` com perfis dev/preview/production)
+- [x] Onboarding em 3 etapas na primeira abertura
+- [x] Tela de abertura animada com progresso real de carregamento
+- [ ] **Must**, Testes cobrindo os repositórios SQLite e a store. É a camada com maior
+      risco de regressão silenciosa: um erro em cálculo de total ou agregação passa
+      despercebido. Hoje a cobertura se concentra em `src/shared/`.
+- [ ] **Must**, Atualizar as capturas de tela. As atuais são anteriores ao redesign e não
+      mostram a aba Cupom nem as formas de pagamento.
+- [ ] **Should**, Exercitar exportação e importação em aparelho real. Nunca foram testadas
+      desde a migração para o SDK 57.
+- [ ] **Should**, Revisar empty states e loading states em todas as telas
+- [ ] **Should**, Rodar `eas build` de fato, com uma conta Expo
+- [ ] **Could**, Dependabot e CodeQL revisados periodicamente
 
-- [x] Documentação open source completa (README, CONTRIBUTING, etc. — Fase 4)
-- [x] CI/CD (lint, typecheck, testes automáticos a cada push/PR — Fase 5)
-- [x] Identidade de marca definitiva: nome, logo, ícone do app (Fase 6 — ver [BRANDING.md](./BRANDING.md))
-- [ ] Testes automatizados cobrindo os repositórios de storage e a store (ver [TESTPLAN.md](./TESTPLAN.md))
-- [ ] Onboarding na primeira abertura do app (explicação rápida das 4 abas)
-- [ ] Empty states e loading states revisados em todas as telas
-- [x] Configuração de build de teste (Expo/EAS) para instalação fora do Expo Go — falta só rodar (ver [PUBLICACAO.md](./PUBLICACAO.md))
+## V2, entregue fora da ordem prevista
 
-## V2 — funcionalidades que agregam além do essencial
+Estes itens estavam planejados para marcos posteriores e foram antecipados:
 
-- [ ] Edição em lote (marcar vários itens como comprados de uma vez)
-- [ ] Gráfico de evolução de preço por item específico ao longo do tempo
-- [ ] Metas de gasto mensal com alerta ao se aproximar do limite
-- [ ] Múltiplas listas/perfis (ex.: "casa" e "trabalho")
-- [ ] Widget de tela inicial (Android/iOS) com o gasto do mês
-- [ ] Backup automático periódico (sem precisar exportar manualmente)
+- [x] **Leitura do cupom fiscal por QR Code** (NFC-e, Minas Gerais), preenche a compra a
+      partir da nota. Estava previsto como V3.
+- [x] Formas de pagamento cadastráveis (débito, crédito, vale refeição)
+- [x] Catálogo organizado em 15 departamentos de supermercado
+- [x] Preço médio por item, calculado do histórico real
+- [x] Reconhecimento de item do catálogo ao ler o cupom, evitando duplicatas
 
-## V3 — expansão de longo prazo
+## V2, pendente
 
-- [ ] Sincronização opcional entre dispositivos (ex.: via arquivo em nuvem do próprio
-      usuário — Google Drive/iCloud —, mantendo o app sem backend próprio)
-- [ ] Leitura de nota fiscal (OCR/QR code) para preencher itens automaticamente
-- [ ] Sugestão de qual mercado visitar com base no histórico de preços por item
-- [ ] Modo compartilhado (duas pessoas da mesma casa registrando na mesma lista)
-- [ ] Internacionalização (moeda e idioma configuráveis)
+- [ ] **Should**, Migrar `expo-file-system` da API `legacy` para a atual. Dívida técnica
+      assumida na migração do SDK 57: a API legada funciona, mas será removida.
+- [ ] **Could**, Gráfico de evolução de preço por item ao longo do tempo
+- [ ] **Could**, Projeção de gasto do mês a partir da média dos anteriores. Cálculo
+      simples sobre dado real, sem IA, se implementado, deve ser chamado de projeção e
+      mostrar a base do cálculo.
+- [ ] **Could**, Metas de gasto mensal com alerta ao se aproximar do limite
+- [ ] **Could**, Edição em lote de itens
+- [ ] **Could**, Múltiplas listas ou perfis (ex.: "casa" e "trabalho")
+- [ ] **Could**, Widget de tela inicial com o gasto do mês
 
-## Fora de escopo (por enquanto)
+## V3, longo prazo
 
-- Autenticação/contas de usuário — o app é local-first por design; adicionar contas mudaria
-  a proposta de "sem backend, sem dado saindo do aparelho".
-- Marketplace ou integração com apps de supermercado — foge do propósito de controle pessoal
-  de gastos.
+- [ ] Leitura de cupom em outros estados. Cada UF tem portal e HTML próprios; hoje só MG.
+- [ ] Sincronização opcional via arquivo em nuvem do próprio usuário (Drive/iCloud),
+      mantendo o app sem backend próprio
+- [ ] Sugestão de qual mercado visitar, com base no histórico de preços por item
+- [ ] Modo compartilhado entre duas pessoas da mesma casa
+- [ ] Internacionalização de moeda e idioma
 
-Veja o backlog priorizado (MoSCoW) para o que entra em cada marco em [BACKLOG.md](./BACKLOG.md).
+## Fora de escopo
+
+| Item                                               | Motivo                                                                                               |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Autenticação e contas de usuário                   | Contraria a proposta local-first; adicionar contas mudaria o produto                                 |
+| Sincronização em nuvem com backend próprio         | Custo de servidor e manutenção incompatíveis com um projeto de portfólio                             |
+| Marketplace ou integração com apps de supermercado | Foge do propósito de controle pessoal de gastos                                                      |
+| Previsão de preços por IA                          | O app não tem dado nem infraestrutura para isso, e anunciar previsão sem cálculo real seria enganoso |
+
+## Como este documento é mantido
+
+Revisado a cada marco concluído. Itens que mudam de prioridade ou saem do escopo são
+atualizados aqui, e a mudança relevante é registrada no
+[CHANGELOG.md](../../CHANGELOG.md).

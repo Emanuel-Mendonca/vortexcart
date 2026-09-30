@@ -38,7 +38,7 @@ import type { NovaCompraFormValues } from '@/utils/validation';
 
 /**
  * As formas de pagamento são cadastráveis, então o ícone é escolhido pelo
- * que o nome contém — "Nubank crédito" continua ganhando ícone de cartão.
+ * que o nome contém, "Nubank crédito" continua ganhando ícone de cartão.
  */
 function iconeMetodoPagamento(nome: string): ComponentProps<typeof Ionicons>['name'] {
   const n = normalizarNome(nome);
@@ -130,7 +130,7 @@ export function NovaCompraScreen() {
    * `scrollToEnd` passaria do ponto e cortaria justamente o campo que está
    * sendo digitado.
    *
-   * O atraso espera a animação de abertura do teclado terminar — antes disso
+   * O atraso espera a animação de abertura do teclado terminar, antes disso
    * a altura visível ainda é a antiga e o destino sairia errado.
    */
   function revelarComposer() {
@@ -179,7 +179,7 @@ export function NovaCompraScreen() {
     setToastMsg(
       `${total} ${total === 1 ? 'item lido' : 'itens lidos'}` +
         (reconhecidos > 0 ? ` · ${reconhecidos} já no catálogo` : '') +
-        ' — confira antes de salvar'
+        ', confira antes de salvar'
     );
   }, [rascunhoCupom, reset, definirRascunhoCupom]);
 
@@ -214,7 +214,7 @@ export function NovaCompraScreen() {
   }
 
   /**
-   * Item do catálogo que corresponde ao que está sendo digitado — ignorando
+   * Item do catálogo que corresponde ao que está sendo digitado, ignorando
    * acento e caixa, senão "cafe" viraria um item novo ao lado de "Café".
    */
   const itemNoCatalogo = catalogo.find((c) => mesmoNome(c.nome, draftNome));
@@ -236,10 +236,10 @@ export function NovaCompraScreen() {
   function escolherSugestao(nome: string) {
     setDraftNome(nome);
     setSugestoesAbertas(false);
-    // Item conhecido nunca é "extra" — ele já faz parte da lista comum.
+    // Item conhecido nunca é "extra", ele já faz parte da lista comum.
     setDraftExtra(false);
     // Preenche o valor com o preço médio já pago por este item, quando houver
-    // histórico. Continua editável — é um ponto de partida, não um travamento.
+    // histórico. Continua editável, é um ponto de partida, não um travamento.
     const precoMedio = precoMedioPorItem[nome]?.precoMedio;
     if (precoMedio != null && precoMedio > 0 && draftValor.trim().length === 0) {
       setDraftValor(precoMedio.toFixed(2).replace('.', ','));
@@ -321,7 +321,7 @@ export function NovaCompraScreen() {
     } catch (erro) {
       // Sem isso a falha de gravação some sem rastro e o botão parece morto.
       console.error('Falha ao salvar a compra', erro);
-      setToastMsg('Não foi possível salvar a compra — tente de novo');
+      setToastMsg('Não foi possível salvar a compra, tente de novo');
       return;
     }
 
@@ -335,7 +335,7 @@ export function NovaCompraScreen() {
 
   /**
    * O botão "Salvar compra" fica no fim da tela e os campos com erro (mês,
-   * supermercado) no início — quem toca no botão não vê a mensagem que o
+   * supermercado) no início, quem toca no botão não vê a mensagem que o
    * formulário mostrou lá em cima. O toast repete o primeiro erro aqui embaixo.
    */
   function onInvalid(errosForm: typeof errors) {
@@ -542,7 +542,7 @@ export function NovaCompraScreen() {
               marginBottom: 12
             }}
           >
-            Nenhum item ainda — use o campo abaixo para adicionar.
+            Nenhum item ainda, use o campo abaixo para adicionar.
           </Text>
         ) : null}
 
@@ -769,7 +769,7 @@ export function NovaCompraScreen() {
                     flex: 1
                   }}
                 >
-                  Item novo — marcar como extra
+                  Item novo, marcar como extra
                 </Text>
               </>
             ) : (

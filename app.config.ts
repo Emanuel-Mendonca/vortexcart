@@ -10,7 +10,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: 'portrait',
   icon: './src/ui/assets/icon.png',
   userInterfaceStyle: 'automatic',
-  // A chave `splash` de topo saiu do ExpoConfig no SDK 57 — a splash agora é
+  // A chave `splash` de topo saiu do ExpoConfig no SDK 57, a splash agora é
   // configurada exclusivamente pelo plugin `expo-splash-screen`, mais abaixo.
   assetBundlePatterns: ['**/*'],
   ios: {

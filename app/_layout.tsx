@@ -25,7 +25,7 @@ SplashScreen.preventAutoHideAsync().catch(() => {
 
 /**
  * Tempo mínimo da tela de abertura. Sem isso ela apareceria por poucos
- * quadros num aparelho rápido — o banco abre em milissegundos — e o efeito
+ * quadros num aparelho rápido, o banco abre em milissegundos, e o efeito
  * seria só um flash desagradável. É a única espera artificial do app.
  */
 const TEMPO_MINIMO_ABERTURA_MS = 1400;
@@ -44,13 +44,13 @@ export default function RootLayout() {
   });
 
   const [dbPronto, setDbPronto] = useState(false);
-  // `null` enquanto ainda não sabemos — evita o onboarding piscar na tela
+  // `null` enquanto ainda não sabemos, evita o onboarding piscar na tela
   // de quem já passou por ele.
   const [mostrarOnboarding, setMostrarOnboarding] = useState<boolean | null>(null);
   const [dbErro, setDbErro] = useState<string | null>(null);
   const [tempoMinimoCumprido, setTempoMinimoCumprido] = useState(false);
 
-  // O relógio começa quando a splash nativa sai de cena — contar a partir da
+  // O relógio começa quando a splash nativa sai de cena, contar a partir da
   // montagem fazia a tela animada aparecer só no último instante, já em
   // "Tudo pronto", sem nunca mostrar as etapas intermediárias.
   useEffect(() => {
@@ -79,7 +79,7 @@ export default function RootLayout() {
   const dadosOk = dbPronto || dbErro != null;
   const pronto = fontesOk && dadosOk && mostrarOnboarding !== null && tempoMinimoCumprido;
 
-  /** Etapa mostrada na tela de abertura — reflete o que está acontecendo. */
+  /** Etapa mostrada na tela de abertura, reflete o que está acontecendo. */
   const etapa: EtapaAbertura = !fontesOk
     ? 'fontes'
     : !dadosOk
@@ -90,7 +90,7 @@ export default function RootLayout() {
 
   async function concluirOnboarding() {
     setMostrarOnboarding(false);
-    // Falha ao gravar só faz a apresentação reaparecer depois — não vale
+    // Falha ao gravar só faz a apresentação reaparecer depois, não vale
     // travar a entrada no app por causa disso.
     await gravarPreferencia(CHAVE_ONBOARDING, '1').catch(() => undefined);
   }

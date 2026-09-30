@@ -5,4 +5,4 @@ contact_links:
     about: Use Discussions para perguntas gerais, não issues.
   - name: Reportar vulnerabilidade de segurança
     url: https://github.com/Emanuel-Mendonca/vortexcart/security/policy
-    about: Nunca reporte vulnerabilidades em uma issue pública — veja o SECURITY.md.
+    about: Nunca reporte vulnerabilidades em uma issue pública, veja o SECURITY.md.

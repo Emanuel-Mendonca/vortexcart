@@ -14,7 +14,7 @@ interface ScreenProps {
 }
 
 /**
- * Raiz das telas — resolve duas coisas que, sem elas, o conteúdo fica
+ * Raiz das telas, resolve duas coisas que, sem elas, o conteúdo fica
  * inacessível no Android moderno:
  *
  * 1. **Áreas do sistema.** A partir do Android 15 o app desenha de ponta a
@@ -23,7 +23,7 @@ interface ScreenProps {
  *
  * 2. **Teclado.** Nesse mesmo modo o `windowSoftInputMode=adjustResize` do
  *    manifesto deixa de encolher a janela, e o teclado passa a cobrir o campo
- *    em foco e os botões abaixo dele — o usuário digita às cegas e toca no
+ *    em foco e os botões abaixo dele, o usuário digita às cegas e toca no
  *    teclado achando que está tocando no botão. O `KeyboardAvoidingView`
  *    devolve esse espaço.
  *

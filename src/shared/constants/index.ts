@@ -19,7 +19,7 @@ export const CATEGORIA_PADRAO = 'Bazar e Utilidades';
 
 /**
  * Departamentos fixos do catálogo, na ordem em que costumam aparecer em um
- * supermercado — a lista segue o trajeto da loja, não a ordem alfabética,
+ * supermercado, a lista segue o trajeto da loja, não a ordem alfabética,
  * para que montar a lista de compras acompanhe o caminho pelos corredores.
  */
 export const CATEGORIAS: readonly string[] = [
@@ -96,7 +96,7 @@ export const CATALOGO_INICIAL: readonly { nome: string; categoria: string }[] = 
 
 /**
  * Formas de pagamento que já vêm cadastradas. A lista é editável pelo
- * usuário (ver tela de Itens), então isto é só o ponto de partida — quem
+ * usuário (ver tela de Itens), então isto é só o ponto de partida, quem
  * paga com um cartão específico pode cadastrar "Nubank", "Alelo" etc.
  */
 export const METODOS_PAGAMENTO_INICIAIS: readonly string[] = [

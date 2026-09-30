@@ -1,7 +1,7 @@
 ---
 name: "\u2728 Feature request"
 about: Sugerir uma ideia ou melhoria para o projeto
-title: "[Feature] "
+title: '[Feature] '
 labels: enhancement
 assignees: ''
 ---
@@ -20,10 +20,10 @@ Outras soluções ou funcionalidades que você considerou.
 
 ## Contexto adicional
 
-Screenshots, mockups, links de referência — qualquer coisa que ajude a entender a ideia.
+Screenshots, mockups, links de referência, qualquer coisa que ajude a entender a ideia.
 
 ## Isso se encaixa em qual marco?
 
-Se você já olhou o [ROADMAP.md](../../ROADMAP.md) e o [BACKLOG.md](../../BACKLOG.md),
+Se você já olhou o [ROADMAP.md](../../docs/projeto/ROADMAP.md),
 indique se essa sugestão parece um Must/Should/Could, na sua opinião (os mantenedores podem
 recalibrar).

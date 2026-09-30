@@ -4,7 +4,7 @@ import type { NovoItemCompra } from '@/types';
  * Extração dos itens da página de consulta da NFC-e (SEFAZ-MG).
  *
  * Esta é a parte mais frágil da funcionalidade: depende do HTML de um portal
- * de terceiro, que pode mudar sem aviso. Por isso ela vive isolada aqui — se
+ * de terceiro, que pode mudar sem aviso. Por isso ela vive isolada aqui, se
  * o portal mudar, só este arquivo precisa de ajuste, e a entrada manual de
  * compras continua funcionando normalmente.
  *
@@ -36,7 +36,7 @@ export function limparTexto(texto: string | null | undefined): string {
  * A regra: se houver vírgula, ela é o separador decimal e os pontos são
  * milhar. Sem vírgula, o último ponto é o decimal.
  *
- * Retorna 0 em vez de NaN — um item ilegível não deve envenenar o total.
+ * Retorna 0 em vez de NaN, um item ilegível não deve envenenar o total.
  */
 export function numeroFlexivel(texto: string | null | undefined): number {
   if (!texto) return 0;
@@ -58,7 +58,7 @@ export function numeroFlexivel(texto: string | null | undefined): number {
 /**
  * JavaScript injetado na WebView depois que a nota aparece.
  *
- * Envia o texto cru de cada linha da tabela — a interpretação acontece do
+ * Envia o texto cru de cada linha da tabela, a interpretação acontece do
  * lado do app, onde dá para testar sem navegador. Também manda uma amostra
  * do HTML quando não encontra nada, para o diagnóstico não depender de
  * adivinhação na próxima vez que o portal mudar.
@@ -80,7 +80,7 @@ export const SCRIPT_EXTRACAO = `
       return;
     }
     var emitente = null;
-    var h = document.querySelector('h4, h3, .txtTopo');
+    var h = document.querySelector('h4, h3.txtTopo');
     if (h) emitente = (h.innerText || h.textContent || '').trim();
     enviar({ tipo: 'nota', mercadoNome: emitente, linhas: textos });
   } catch (e) {
@@ -132,7 +132,7 @@ export function lerLinhaItem(linhaBruta: string): NovoItemCompra | null {
   const quantidade = numeroFlexivel(mQtd[1]);
   const valorTotal = numeroFlexivel(mValor[1]);
 
-  // O portal de MG não mostra valor unitário — só quantidade e total. Para
+  // O portal de MG não mostra valor unitário, só quantidade e total. Para
   // itens vendidos por peso (UN: KG) isso dá o preço por quilo, que é o que
   // faz sentido guardar.
   const valorUnitario = quantidade > 0 ? valorTotal / quantidade : valorTotal;

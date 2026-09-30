@@ -43,7 +43,7 @@ describe('casarComCatalogo', () => {
     expect(casarComCatalogo('Arroz', CATALOGO)).toBe('Arroz');
   });
 
-  it('exige palavra inteira — não casa prefixo de outra palavra', () => {
+  it('exige palavra inteira, não casa prefixo de outra palavra', () => {
     // O erro clássico: "SALGADINHO" contém "sal", mas não é sal.
     expect(casarComCatalogo('SALGADINHO ONDULADO', CATALOGO)).toBeNull();
     expect(casarComCatalogo('PANETONE 400G', CATALOGO)).toBeNull();

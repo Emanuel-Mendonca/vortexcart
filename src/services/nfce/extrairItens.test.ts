@@ -8,8 +8,8 @@ import {
 
 /**
  * Linhas copiadas da consulta real de uma NFC-e no portal da SEFAZ-MG
- * (Supermercado Pilar, Itajubá/MG). O formato misto — quantidade com ponto
- * decimal e dinheiro com vírgula — vem de lá, não é invenção do teste.
+ * (Supermercado Pilar, Itajubá/MG). O formato misto, quantidade com ponto
+ * decimal e dinheiro com vírgula, vem de lá, não é invenção do teste.
  */
 const LINHA_KG =
   'CEBOLA MD PACOTE (Código: 44050857606001) Qtde total de ítens: 0.8712 UN: KG Valor total R$: R$ 4,87';

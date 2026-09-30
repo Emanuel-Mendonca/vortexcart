@@ -10,7 +10,7 @@ import { getTheme } from '@/theme';
  *
  * O mockup de referência anunciava sincronização em nuvem, múltiplos
  * aparelhos, tempo real e criptografia AES-256 ponta a ponta. Nada disso
- * existe — e "sincronização em nuvem própria" está em *Won't have* no
+ * existe, e "sincronização em nuvem própria" está em *Won't have* no
  * BACKLOG.md, por contrariar a proposta local-first do projeto.
  *
  * Curiosamente os próprios comentários daquele HTML diziam "Tag Topo: 100%
@@ -153,7 +153,7 @@ export function PassoDados() {
         </Text>
       </View>
 
-      {/* Barra de exportação — os três formatos existem de verdade */}
+      {/* Barra de exportação, os três formatos existem de verdade */}
       <View
         style={[
           styles.barraExport,

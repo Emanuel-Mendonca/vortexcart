@@ -3,17 +3,17 @@
  * -----------------------------------------------------------------------
  * Fonte única de verdade para cores, tipografia, espaçamento e raios.
  *
- * Paleta "Vortex" — atmosférica, cósmica, glassmorphism. Extraída de um
+ * Paleta "Vortex", atmosférica, cósmica, glassmorphism. Extraída de um
  * esquema Material Design 3 (tons "primary/secondary/tertiary/surface"
  * completos, fornecidos para o tema escuro). O tema claro foi derivado
  * usando os próprios tokens "inverse-*" e "*-fixed*" do M3, que existem
  * exatamente para compor a versão oposta do tema de forma consistente
- * com a mesma paleta — não são cores inventadas à parte.
+ * com a mesma paleta, não são cores inventadas à parte.
  */
 
 export const palette = {
   lavender: '#CCBFF7',
-  lavenderDeep: '#625788', // "inverse-primary" do M3 — primary do tema claro
+  lavenderDeep: '#625788', // "inverse-primary" do M3, primary do tema claro
   gold: '#D3C87C',
   night: '#10131B',
   white: '#FFFFFF'
@@ -42,7 +42,7 @@ export const colorTokens: Record<'light' | 'dark', ColorPalette> = {
     background: palette.white,
     surface: palette.white,
     surfaceAlt: '#F3F0FA', // tonalidade clara da família lavanda
-    text: '#1E1341', // "on-primary-fixed" — texto escuro com matiz roxo
+    text: '#1E1341', // "on-primary-fixed", texto escuro com matiz roxo
     textMuted: 'rgba(30,19,65,0.62)',
     textFaint: 'rgba(30,19,65,0.4)',
     border: '#7A7290',
@@ -98,7 +98,7 @@ export const radii = {
 } as const;
 
 /**
- * Sombras suaves e "glow" colorido, para o efeito glassmorphism —
+ * Sombras suaves e "glow" colorido, para o efeito glassmorphism,
  * substituem o offset sólido/hard-edge da identidade anterior.
  */
 export const shadows = {

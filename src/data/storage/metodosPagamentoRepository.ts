@@ -8,7 +8,7 @@ export async function listMetodosPagamento(): Promise<MetodoPagamento[]> {
 }
 
 /**
- * @returns `true` se a forma de pagamento entrou, `false` se já existia — o
+ * @returns `true` se a forma de pagamento entrou, `false` se já existia, o
  * `INSERT OR IGNORE` não falha em nome duplicado, apenas não grava, e sem
  * esse retorno a tela não teria como diferenciar os dois casos.
  */

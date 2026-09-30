@@ -13,7 +13,7 @@ let dbInstance: SQLite.SQLiteDatabase | null = null;
  * Abertura em andamento. A store dispara várias consultas em paralelo
  * (`Promise.all` em `refreshTudo`) e todas chamam `getDb()` ao mesmo tempo.
  * Sem compartilhar a mesma promessa, cada uma roda o schema e as migrações
- * por conta própria — e duas que passem juntas pelo `PRAGMA table_info`
+ * por conta própria, e duas que passem juntas pelo `PRAGMA table_info`
  * tentam o mesmo `ALTER TABLE`, derrubando a inicialização do banco com
  * "duplicate column name".
  */
@@ -85,7 +85,7 @@ async function migrarColunasNovas(db: SQLite.SQLiteDatabase): Promise<void> {
 
 /**
  * Compras gravadas antes de existir forma de pagamento ficam com a coluna
- * nula — e é assim que devem ficar: inventar um método para elas seria
+ * nula, e é assim que devem ficar: inventar um método para elas seria
  * fabricar um dado que o usuário nunca informou.
  */
 async function migrarMetodoPagamento(db: SQLite.SQLiteDatabase): Promise<void> {
@@ -122,7 +122,7 @@ async function migrarCategoriasAntigas(db: SQLite.SQLiteDatabase): Promise<void>
 
 /**
  * Semeia as formas de pagamento padrão apenas uma vez. Se o usuário apagar
- * todas de propósito, não queremos ressuscitá-las a cada abertura — por isso
+ * todas de propósito, não queremos ressuscitá-las a cada abertura, por isso
  * a checagem é feita sobre a existência de qualquer linha, e não item a item.
  */
 async function seedMetodosPagamento(db: SQLite.SQLiteDatabase): Promise<void> {
@@ -143,7 +143,7 @@ async function seedCatalogoInicial(db: SQLite.SQLiteDatabase): Promise<void> {
   if (row && row.total > 0) return;
 
   for (const { nome, categoria } of CATALOGO_INICIAL) {
-    await db.runAsync('INSERT OR IGNORE INTO catalogo_itens (nome, categoria) VALUES (?, ?)', [
+    await db.runAsync('INSERT OR IGNORE INTO catalogo_itens (nome, categoria) VALUES (??)', [
       nome,
       categoria
     ]);
@@ -153,7 +153,7 @@ async function seedCatalogoInicial(db: SQLite.SQLiteDatabase): Promise<void> {
 /**
  * Confere se a conexão guardada ainda está viva.
  *
- * O objeto nativo do SQLite pode ser destruído por baixo do JS — quando o app
+ * O objeto nativo do SQLite pode ser destruído por baixo do JS, quando o app
  * fica um tempo em background e o Android recupera memória, por exemplo. O
  * singleton continua apontando para um handle morto, e a próxima escrita
  * falha com `NativeDatabase.prepareAsync has been rejected` /
@@ -172,7 +172,7 @@ async function conexaoViva(db: SQLite.SQLiteDatabase): Promise<boolean> {
 /**
  * Abre (ou cria) o banco e garante que o schema e os dados iniciais
  * existam. Chamado no início do app (ver app/_layout.tsx) e, depois disso,
- * por cada repositório antes de qualquer operação — se a conexão em cache
+ * por cada repositório antes de qualquer operação, se a conexão em cache
  * tiver morrido, reabre de forma transparente.
  */
 export async function getDb(): Promise<SQLite.SQLiteDatabase> {
@@ -180,9 +180,9 @@ export async function getDb(): Promise<SQLite.SQLiteDatabase> {
 
   if (dbInstance) {
     if (await conexaoViva(dbInstance)) return dbInstance;
-    console.warn('Conexão com o SQLite perdida — reabrindo o banco.');
+    console.warn('Conexão com o SQLite perdida, reabrindo o banco.');
     // Tira o handle morto do cache nativo. Pode falhar (o objeto já está
-    // inválido) — é esperado, e não impede a reabertura.
+    // inválido), é esperado, e não impede a reabertura.
     await dbInstance.closeAsync().catch(() => undefined);
     dbInstance = null;
     reabrindo = true;
@@ -201,7 +201,7 @@ export async function getDb(): Promise<SQLite.SQLiteDatabase> {
 async function abrirEInicializar(reabrindo: boolean): Promise<SQLite.SQLiteDatabase> {
   // O módulo nativo mantém um cache por caminho de arquivo e, sem
   // `useNewConnection`, `openDatabaseAsync` devolve o MESMO objeto que já
-  // estava lá — inclusive quando ele está morto. Ao reabrir, forçamos uma
+  // estava lá, inclusive quando ele está morto. Ao reabrir, forçamos uma
   // conexão realmente nova; na primeira abertura o cache está vazio e o
   // comportamento padrão basta.
   const db = await SQLite.openDatabaseAsync(DATABASE_NAME, { useNewConnection: reabrindo });
@@ -219,8 +219,8 @@ async function abrirEInicializar(reabrindo: boolean): Promise<SQLite.SQLiteDatab
  *
  * O `PRAGMA` sozinho não basta: o SQLite não tem `ADD COLUMN IF NOT EXISTS`,
  * e entre a checagem e o `ALTER` existe uma janela. O erro de coluna
- * duplicada significa que outra rotina já fez o trabalho — o resultado
- * desejado — então ele é absorvido em vez de derrubar a abertura do banco.
+ * duplicada significa que outra rotina já fez o trabalho, o resultado
+ * desejado, então ele é absorvido em vez de derrubar a abertura do banco.
  */
 async function adicionarColunaSeAusente(
   db: SQLite.SQLiteDatabase,

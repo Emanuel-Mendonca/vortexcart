@@ -21,7 +21,7 @@ export async function getOrCreateMercado(nomeBruto: string): Promise<number> {
  * Corrigir o nome de um mercado (editando uma compra) cria um registro novo e
  * deixa o antigo sem nenhuma compra apontando para ele. Listar a tabela
  * inteira faria o filtro do Histórico oferecer um mercado que, na prática,
- * não existe mais — e que não devolve resultado nenhum ao ser selecionado.
+ * não existe mais, e que não devolve resultado nenhum ao ser selecionado.
  */
 export async function listMercadosNomes(): Promise<string[]> {
   const db = await getDb();

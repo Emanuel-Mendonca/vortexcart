@@ -14,7 +14,7 @@ interface AmbientGlowProps {
  * Mancha de luz ambiente decorativa, usada atrás de cards para dar a
  * sensação de "glow" atmosférico. RN não tem blur de fundo nativo sem
  * biblioteca extra, então aproximamos com um círculo grande de cor sólida
- * em baixa opacidade — funciona bem porque nossas superfícies já são
+ * em baixa opacidade, funciona bem porque nossas superfícies já são
  * escuras e o efeito não precisa ser um blur perfeito para "ler" como luz.
  */
 export function AmbientGlow({

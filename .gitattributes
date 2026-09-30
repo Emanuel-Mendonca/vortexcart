@@ -10,7 +10,7 @@
 # independente do `core.autocrlf` de cada contribuidor.
 * text=auto eol=lf
 
-# Binários — nunca normalizar.
+# Binários, nunca normalizar.
 *.png binary
 *.jpg binary
 *.jpeg binary

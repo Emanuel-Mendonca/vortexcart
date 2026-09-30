@@ -21,8 +21,8 @@ type Etapa = 'escaneando' | 'portal';
  * Leitura do cupom fiscal em duas etapas.
  *
  * 1. Câmera lê o QR e extrai a chave de acesso (o QR **não** traz os itens).
- * 2. O portal da SEFAZ-MG abre numa WebView. O usuário resolve o reCAPTCHA —
- *    é ele quem passa pela verificação, o app não a contorna — e assim que a
+ * 2. O portal da SEFAZ-MG abre numa WebView. O usuário resolve o reCAPTCHA,
+ *    é ele quem passa pela verificação, o app não a contorna, e assim que a
  *    nota aparece, o app lê os itens da página já carregada.
  *
  * Só MG por enquanto: cada UF tem portal e HTML próprios.

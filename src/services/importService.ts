@@ -27,7 +27,7 @@ export interface ResultadoImportacao {
 
 /**
  * Abre o seletor de arquivos do sistema, valida o JSON escolhido e
- * insere os dados no banco local. Não apaga dados existentes — os
+ * insere os dados no banco local. Não apaga dados existentes, os
  * registros importados são adicionados aos que já existem.
  */
 export async function selecionarEImportarBackup(): Promise<ResultadoImportacao> {

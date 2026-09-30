@@ -4,11 +4,11 @@ O que este PR faz e por quê. Se resolve uma issue, referencie com `Closes #123`
 
 ## Tipo de mudança
 
-- [ ] `feat` — nova funcionalidade
-- [ ] `fix` — correção de bug
-- [ ] `docs` — documentação
-- [ ] `refactor` — mudança de código sem alterar comportamento
-- [ ] `chore` — manutenção, config, dependências
+- [ ] `feat`, nova funcionalidade
+- [ ] `fix`, correção de bug
+- [ ] `docs`, documentação
+- [ ] `refactor`, mudança de código sem alterar comportamento
+- [ ] `chore`, manutenção, config, dependências
 
 ## Como testar
 

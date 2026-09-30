@@ -24,7 +24,7 @@ module.exports = function (api) {
       ],
       // Deve ser sempre o último da lista.
       // No Reanimated 4 o plugin de worklets passou a viver em um pacote
-      // próprio — `react-native-reanimated/plugin` virou só um reexport dele.
+      // próprio, `react-native-reanimated/plugin` virou só um reexport dele.
       'react-native-worklets/plugin'
     ]
   };

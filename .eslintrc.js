@@ -34,7 +34,7 @@ module.exports = {
     '.expo/',
     'babel.config.js',
     'metro.config.js',
-    // Gerado pelo Expo a cada `expo start` e já ignorado no Git — o próprio
+    // Gerado pelo Expo a cada `expo start` e já ignorado no Git, o próprio
     // arquivo diz que não deve ser editado, então não faz sentido lintá-lo.
     'expo-env.d.ts'
   ]
