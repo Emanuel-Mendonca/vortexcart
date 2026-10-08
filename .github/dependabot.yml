@@ -1,36 +1,30 @@
 version: 2
 updates:
-  # Dependências npm (package.json)
+  # Dependências npm: SEM atualização de versão por aqui.
+  #
+  # Quem decide as versões de `expo`, `react`, `react-native`, `reanimated` e
+  # companhia é o `npx expo install --fix`, que sobe o conjunto inteiro de uma
+  # vez respeitando a combinação que o SDK valida. O Dependabot propõe pacote a
+  # pacote, o que desalinha esse conjunto: foi assim que ele abriu 15 PRs
+  # contra um estado do projeto que já tinha avançado.
+  #
+  # `open-pull-requests-limit: 0` desliga as propostas de versão. Os alertas de
+  # segurança do GitHub continuam funcionando normalmente, porque não dependem
+  # deste arquivo.
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
-      interval: 'weekly'
-      day: 'monday'
-    open-pull-requests-limit: 10
-    groups:
-      expo-e-relacionados:
-        patterns:
-          - 'expo*'
-          - '@expo/*'
-          - '@expo-google-fonts/*'
-      ferramentas-de-qualidade:
-        patterns:
-          - 'eslint*'
-          - '@typescript-eslint/*'
-          - 'prettier*'
-          - 'husky'
-          - 'lint-staged'
-          - '@commitlint/*'
-    commit-message:
-      prefix: 'chore'
-      include: 'scope'
+      interval: 'monthly'
+    open-pull-requests-limit: 0
 
-  # Ações usadas nos workflows (.github/workflows)
+  # Ações dos workflows: aqui o Dependabot ajuda de verdade.
+  # Mexe só em CI, não toca no app, e manter atualizado evita que uma ação
+  # obsoleta quebre o pipeline sem aviso.
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
-      interval: 'weekly'
-      day: 'monday'
+      interval: 'monthly'
+    open-pull-requests-limit: 3
     commit-message:
       prefix: 'ci'
       include: 'scope'
