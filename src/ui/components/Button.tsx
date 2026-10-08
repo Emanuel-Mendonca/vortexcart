@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 
 interface ButtonProps {
   label: string;
@@ -20,8 +20,7 @@ export function Button({
   disabled,
   loading
 }: ButtonProps) {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
   const isDisabled = disabled || loading;
 
   const backgroundColor =

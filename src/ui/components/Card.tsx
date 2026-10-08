@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import { StyleSheet, View, useColorScheme } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 
 interface CardProps {
   children: ReactNode;
@@ -9,8 +9,7 @@ interface CardProps {
 }
 
 export function Card({ children, style }: CardProps) {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
   const glow = theme.shadows.md;
 
   return (

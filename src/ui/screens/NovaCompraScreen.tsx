@@ -4,16 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useRef, useState } from 'react';
 import type { ComponentProps } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import {
-  Animated,
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  useColorScheme
-} from 'react-native';
+import { Animated, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import {
   AmbientGlow,
@@ -28,7 +19,8 @@ import {
   Toast
 } from '@/components';
 import { useComprasStore, useCompraEmEdicao } from '@/store/useComprasStore';
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
+import type { Theme } from '@/theme';
 import { getCategoriaIcon } from '@/utils/categoria';
 import { formatBRL } from '@/utils/currency';
 import { currentMonthValue } from '@/utils/date';
@@ -52,7 +44,7 @@ function iconeMetodoPagamento(nome: string): ComponentProps<typeof Ionicons>['na
   return 'wallet-outline';
 }
 
-function labelStyle(theme: ReturnType<typeof getTheme>) {
+function labelStyle(theme: Theme) {
   return {
     fontFamily: theme.fontFamily.semiBold,
     fontSize: theme.type.caption.fontSize,
@@ -94,8 +86,7 @@ function PulsingDot({ color }: { color: string }) {
 }
 
 export function NovaCompraScreen() {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
 
   const salvarCompra = useComprasStore((s) => s.salvarCompra);
   const cancelarEdicao = useComprasStore((s) => s.cancelarEdicao);

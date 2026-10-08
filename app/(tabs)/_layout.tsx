@@ -1,13 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import { useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 
 export default function TabsLayout() {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
   // Com o app desenhando de ponta a ponta (Android 15+), a barra de abas fica
   // por baixo da barra de navegação do sistema sem esta reserva de espaço.
   const insets = useSafeAreaInsets();

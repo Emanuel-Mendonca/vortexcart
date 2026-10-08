@@ -1,9 +1,9 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useRef } from 'react';
-import { Animated, Easing, Image, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { Animated, Easing, Image, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
 
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 
 import { AmbientGlow } from './AmbientGlow';
 
@@ -40,8 +40,7 @@ interface TelaAberturaProps {
  * mostrada vem de dado real.
  */
 export function TelaAbertura({ etapa, versao }: TelaAberturaProps) {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
 
   const giro = useRef(new Animated.Value(0)).current;
   const giroInverso = useRef(new Animated.Value(0)).current;

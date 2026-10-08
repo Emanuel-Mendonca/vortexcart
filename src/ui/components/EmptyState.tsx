@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
-import { StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -12,8 +12,7 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({ icon, message }: EmptyStateProps) {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
 
   return (
     <View style={styles.wrapper}>

@@ -1,7 +1,7 @@
-import { StyleSheet, Text, TextInput, View, useColorScheme } from 'react-native';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
 import type { KeyboardTypeOptions } from 'react-native';
 
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 
 interface TextFieldProps {
   label?: string;
@@ -25,8 +25,7 @@ export function TextField({
   textAlign = 'left',
   onFocus
 }: TextFieldProps) {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
 
   return (
     <View style={styles.wrapper}>

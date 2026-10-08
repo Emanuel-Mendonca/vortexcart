@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import type { ComponentProps } from 'react';
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Polyline } from 'react-native-svg';
 
 import { AmbientGlow, Badge, Card, EmptyState, Screen, Toast } from '@/components';
@@ -15,9 +16,10 @@ import {
   selecionarEImportarBackup
 } from '@/services';
 import { useComprasStore } from '@/store/useComprasStore';
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 import { formatBRL } from '@/utils/currency';
 import { monthLabel } from '@/utils/date';
+import { normalizarNome } from '@/utils/texto';
 
 type Operacao = 'json' | 'csv' | 'pdf' | 'importar' | null;
 
@@ -42,11 +44,25 @@ function alturaBarra(total: number, maxMes: number): number {
   return Math.max(CHART_MIN_BAR, (total / maxMes) * (CHART_HEIGHT - CHART_HEADROOM));
 }
 
+/** Ícone pelo que o nome contém: as formas são cadastráveis pelo usuário. */
+function iconeMetodo(nome: string | null): ComponentProps<typeof Ionicons>['name'] {
+  if (!nome) return 'help-circle-outline';
+  const n = normalizarNome(nome);
+  if (n.includes('vale') || n.includes('refeicao') || n.includes('alimentacao')) {
+    return 'fast-food-outline';
+  }
+  if (n.includes('credito')) return 'card-outline';
+  if (n.includes('debito')) return 'card';
+  if (n.includes('pix')) return 'flash-outline';
+  if (n.includes('dinheiro') || n.includes('especie')) return 'cash-outline';
+  return 'wallet-outline';
+}
+
 export function ResumoScreen() {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
 
   const gastoPorMes = useComprasStore((s) => s.gastoPorMes);
+  const gastoPorMetodo = useComprasStore((s) => s.gastoPorMetodo);
   const comparativoMercados = useComprasStore((s) => s.comparativoMercados);
   const compras = useComprasStore((s) => s.compras);
   const catalogo = useComprasStore((s) => s.catalogo);
@@ -415,6 +431,94 @@ export function ResumoScreen() {
         <Card>
           <View style={styles.cardHeaderRow}>
             <View style={[styles.cardIcon, { backgroundColor: theme.colors.background }]}>
+              <Ionicons name="wallet" size={18} color={theme.colors.primary} />
+            </View>
+            <View>
+              <Text
+                style={{
+                  fontFamily: theme.fontFamily.bold,
+                  fontSize: theme.type.bodyLg.fontSize,
+                  color: theme.colors.text
+                }}
+              >
+                Gasto por forma de pagamento
+              </Text>
+            </View>
+          </View>
+
+          {gastoPorMetodo.length === 0 ? (
+            <EmptyState icon="wallet-outline" message="Ainda sem compras registradas." />
+          ) : (
+            gastoPorMetodo.map((m) => {
+              const fatia = totalPeriodo > 0 ? (m.totalGasto / totalPeriodo) * 100 : 0;
+              const chave = m.metodoNome ?? '__sem_forma__';
+              return (
+                <View key={chave} style={styles.metodoBloco}>
+                  <View style={styles.metodoLinhaTopo}>
+                    <View style={styles.metodoIdentidade}>
+                      <Ionicons
+                        name={iconeMetodo(m.metodoNome)}
+                        size={15}
+                        color={m.metodoNome ? theme.colors.primary : theme.colors.textFaint}
+                      />
+                      <Text
+                        numberOfLines={1}
+                        style={{
+                          flex: 1,
+                          fontFamily: theme.fontFamily.semiBold,
+                          fontSize: theme.type.body.fontSize,
+                          color: m.metodoNome ? theme.colors.text : theme.colors.textMuted
+                        }}
+                      >
+                        {m.metodoNome ?? 'Sem forma informada'}
+                      </Text>
+                    </View>
+                    <Text
+                      style={{
+                        fontFamily: theme.fontFamily.extraBold,
+                        fontSize: theme.type.body.fontSize,
+                        color: theme.colors.text,
+                        marginLeft: 10
+                      }}
+                    >
+                      {formatBRL(m.totalGasto)}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={[styles.progressTrack, { backgroundColor: theme.colors.background }]}
+                  >
+                    <View
+                      style={{
+                        width: `${Math.max(fatia, 1)}%`,
+                        height: '100%',
+                        borderRadius: 999,
+                        backgroundColor: m.metodoNome
+                          ? theme.colors.primary
+                          : theme.colors.borderMuted
+                      }}
+                    />
+                  </View>
+
+                  <Text
+                    style={{
+                      fontFamily: theme.fontFamily.medium,
+                      fontSize: 11,
+                      color: theme.colors.textMuted
+                    }}
+                  >
+                    {fatia.toFixed(0)}% do período · {m.quantidadeCompras}{' '}
+                    {m.quantidadeCompras === 1 ? 'compra' : 'compras'}
+                  </Text>
+                </View>
+              );
+            })
+          )}
+        </Card>
+
+        <Card>
+          <View style={styles.cardHeaderRow}>
+            <View style={[styles.cardIcon, { backgroundColor: theme.colors.background }]}>
               <Ionicons name="swap-vertical" size={18} color={theme.colors.primary} />
             </View>
             <View>
@@ -495,8 +599,16 @@ export function ResumoScreen() {
                 color={theme.colors.primary}
               />
             </View>
+            {/* `flex: 1` é o que faz o texto quebrar dentro da moldura; sem
+                ele a linha não encolhe e o rótulo ultrapassa a borda. */}
             <Text
-              style={{ fontFamily: theme.fontFamily.bold, fontSize: 13, color: theme.colors.text }}
+              style={{
+                flex: 1,
+                fontFamily: theme.fontFamily.bold,
+                fontSize: 13,
+                lineHeight: 18,
+                color: theme.colors.text
+              }}
             >
               Toque para importar um backup (.json)
             </Text>
@@ -537,8 +649,7 @@ function ExportButton({
   loading?: boolean;
   disabled?: boolean;
 }) {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
 
   return (
     <Pressable
@@ -600,6 +711,9 @@ const styles = StyleSheet.create({
   marketBlock: { marginBottom: 16, gap: 6 },
   marketTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   progressTrack: { height: 8, borderRadius: 999, overflow: 'hidden' },
+  metodoBloco: { gap: 6, marginBottom: 14 },
+  metodoLinhaTopo: { flexDirection: 'row', alignItems: 'center' },
+  metodoIdentidade: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
   insightBox: { flexDirection: 'row', gap: 10, padding: 12, borderRadius: 12, marginTop: 4 },
   exportRow: { flexDirection: 'row', gap: 8 },
   exportButton: { flex: 1, alignItems: 'center', gap: 4, paddingVertical: 14, borderRadius: 14 },

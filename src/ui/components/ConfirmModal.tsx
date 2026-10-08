@@ -1,6 +1,6 @@
-import { Modal, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { Modal, StyleSheet, Text, View } from 'react-native';
 
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 
 import { Button } from './Button';
 
@@ -19,8 +19,7 @@ export function ConfirmModal({
   onConfirm,
   onDismiss
 }: ConfirmModalProps) {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>

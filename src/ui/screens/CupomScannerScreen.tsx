@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 import type { WebViewMessageEvent } from 'react-native-webview';
 
@@ -10,7 +10,7 @@ import { AmbientGlow, Button, Screen, Toast } from '@/components';
 import { SCRIPT_EXTRACAO, normalizarNota } from '@/services/nfce/extrairItens';
 import type { PayloadWebView } from '@/services/nfce/extrairItens';
 import { useComprasStore } from '@/store/useComprasStore';
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 import { QrCodeInvalidoError, lerQrCodeNfce, urlPortalMg } from '@/utils/nfce';
 import type { ChaveNfce } from '@/utils/nfce';
 import { casarComCatalogo } from '@/utils/texto';
@@ -28,8 +28,7 @@ type Etapa = 'escaneando' | 'portal';
  * Só MG por enquanto: cada UF tem portal e HTML próprios.
  */
 export function CupomScannerScreen() {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
   const router = useRouter();
 
   const [permissao, pedirPermissao] = useCameraPermissions();

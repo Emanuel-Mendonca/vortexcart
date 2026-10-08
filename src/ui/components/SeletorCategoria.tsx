@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 import { getCategoriaIcon } from '@/utils/categoria';
 
 interface SeletorCategoriaProps {
@@ -20,8 +20,7 @@ interface SeletorCategoriaProps {
  *, o custo é um toque a mais, e o ganho é a tela respirar.
  */
 export function SeletorCategoria({ label, categorias, valor, onChange }: SeletorCategoriaProps) {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
   const [aberto, setAberto] = useState(false);
 
   return (

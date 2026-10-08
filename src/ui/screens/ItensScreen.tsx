@@ -1,15 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
-import {
-  FlatList,
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  useColorScheme
-} from 'react-native';
+import { FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import {
   AmbientGlow,
@@ -18,19 +9,19 @@ import {
   EmptyState,
   Screen,
   SeletorCategoria,
+  SeletorTema,
   TextField,
   Toast
 } from '@/components';
 import { CATEGORIAS, CATEGORIA_PADRAO } from '@/constants';
 import { useComprasStore } from '@/store/useComprasStore';
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 import type { CatalogoItem, MetodoPagamento } from '@/types';
 import { getCategoriaIcon } from '@/utils/categoria';
 import { formatBRL } from '@/utils/currency';
 
 export function ItensScreen() {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
 
   const catalogo = useComprasStore((s) => s.catalogo);
   const precoMedioPorItem = useComprasStore((s) => s.precoMedioPorItem);
@@ -143,6 +134,8 @@ export function ItensScreen() {
               left={-70}
               opacity={0.1}
             />
+
+            <SeletorTema />
 
             <View
               style={[

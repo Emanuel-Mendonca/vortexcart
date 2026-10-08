@@ -1,9 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef } from 'react';
-import { Animated, Easing, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 
 /**
  * Etapa final: onde os dados ficam e como sair com eles.
@@ -19,8 +19,7 @@ import { getTheme } from '@/theme';
  * veio do mockup sem alteração, porque essa parte o app faz de verdade.
  */
 export function PassoDados() {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
 
   const giro = useRef(new Animated.Value(0)).current;
   const pulso = useRef(new Animated.Value(0)).current;

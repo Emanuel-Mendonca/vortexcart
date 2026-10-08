@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 
 interface CheckboxProps {
   checked: boolean;
@@ -9,8 +9,7 @@ interface CheckboxProps {
 }
 
 export function Checkbox({ checked, onToggle }: CheckboxProps) {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
 
   return (
     <Pressable

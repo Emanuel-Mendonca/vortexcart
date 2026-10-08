@@ -9,15 +9,15 @@ import {
 import Constants from 'expo-constants';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { useColorScheme } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { Onboarding, TelaAbertura } from '@/components';
 import type { EtapaAbertura } from '@/components';
 import { CHAVE_ONBOARDING, gravarPreferencia, lerPreferencia } from '@/storage';
 import { useComprasStore } from '@/store/useComprasStore';
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 
 SplashScreen.preventAutoHideAsync().catch(() => {
   /* noop: ok se já estiver escondida */
@@ -31,8 +31,7 @@ SplashScreen.preventAutoHideAsync().catch(() => {
 const TEMPO_MINIMO_ABERTURA_MS = 1400;
 
 export default function RootLayout() {
-  const systemScheme = useColorScheme();
-  const theme = getTheme(systemScheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
   const initStore = useComprasStore((s) => s.init);
 
   const [fontsLoaded, fontError] = useFonts({
@@ -106,6 +105,7 @@ export default function RootLayout() {
   if (!pronto) {
     return (
       <SafeAreaProvider>
+        <StatusBar style={theme.scheme === 'dark' ? 'light' : 'dark'} />
         <TelaAbertura etapa={etapa} versao={Constants.expoConfig?.version ?? '0.1.0'} />
       </SafeAreaProvider>
     );
@@ -113,6 +113,10 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
+      {/* Sem isto os ícones da barra de status ficam claros sobre fundo
+          claro e somem. No tema escuro o padrão do sistema já coincidia,
+          então o problema só apareceu com o modo claro. */}
+      <StatusBar style={theme.scheme === 'dark' ? 'light' : 'dark'} />
       <Onboarding visible={mostrarOnboarding === true} onConcluir={concluirOnboarding} />
       <Stack
         screenOptions={{

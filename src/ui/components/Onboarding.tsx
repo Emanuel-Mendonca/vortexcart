@@ -1,18 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
-import {
-  Animated,
-  Easing,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  useColorScheme
-} from 'react-native';
+import { Animated, Easing, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 
 import { AmbientGlow } from './AmbientGlow';
 import { PassoComparacao } from './onboarding/PassoComparacao';
@@ -167,8 +158,7 @@ interface OnboardingProps {
 }
 
 export function Onboarding({ visible, onConcluir }: OnboardingProps) {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
   const [indice, setIndice] = useState(0);
 
   const giro = useRef(new Animated.Value(0)).current;

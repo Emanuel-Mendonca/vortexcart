@@ -1,15 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import {
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  useColorScheme
-} from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import {
   AmbientGlow,
@@ -21,7 +13,7 @@ import {
   Screen
 } from '@/components';
 import { useComprasStore } from '@/store/useComprasStore';
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 import type { CompraComItens } from '@/types';
 import { formatBRL } from '@/utils/currency';
 import { currentMonthValue, monthLabel } from '@/utils/date';
@@ -32,8 +24,7 @@ interface GrupoMes {
 }
 
 export function HistoricoScreen() {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
   const router = useRouter();
 
   const compras = useComprasStore((s) => s.compras);
@@ -461,8 +452,7 @@ function FiltroChip({
   compact?: boolean;
   icon?: keyof typeof Ionicons.glyphMap;
 }) {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
 
   return (
     <Pressable

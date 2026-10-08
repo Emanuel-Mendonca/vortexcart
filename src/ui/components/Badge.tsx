@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
-import { StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -13,8 +13,7 @@ interface BadgeProps {
 }
 
 export function Badge({ label, icon, variant = 'accent' }: BadgeProps) {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
 
   const backgroundColor = variant === 'accent' ? theme.colors.accent : theme.colors.primary;
   const textColor = variant === 'accent' ? theme.colors.onAccent : theme.colors.onPrimary;

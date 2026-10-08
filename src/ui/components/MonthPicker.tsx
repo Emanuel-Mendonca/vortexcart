@@ -1,9 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { FlatList, Modal, Pressable, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { FlatList, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { MESES_PT } from '@/constants';
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 import { buildMonthValue, monthLabel, parseMonthValue } from '@/utils/date';
 
 import { Button } from './Button';
@@ -14,8 +14,7 @@ interface MonthPickerProps {
 }
 
 export function MonthPicker({ value, onChange }: MonthPickerProps) {
-  const scheme = useColorScheme();
-  const theme = getTheme(scheme === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
   const [open, setOpen] = useState(false);
 
   const { ano, mesIndex } = parseMonthValue(value);

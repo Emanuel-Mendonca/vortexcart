@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
-import { KeyboardAvoidingView, Platform, View, useColorScheme } from 'react-native';
+import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { getTheme } from '@/theme';
+import { useTema } from '@/theme';
 
 interface ScreenProps {
   children: ReactNode;
@@ -31,7 +31,7 @@ interface ScreenProps {
  */
 export function Screen({ children, respeitarBase = false }: ScreenProps) {
   const insets = useSafeAreaInsets();
-  const theme = getTheme(useColorScheme() === 'dark' ? 'dark' : 'light');
+  const theme = useTema();
 
   return (
     <View
