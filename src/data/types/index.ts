@@ -72,6 +72,13 @@ export interface GastoPorMes {
   total: number;
 }
 
+export interface GastoPorMetodoPagamento {
+  /** Nome da forma de pagamento, ou `null` para compras sem forma informada. */
+  metodoNome: string | null;
+  totalGasto: number;
+  quantidadeCompras: number;
+}
+
 export interface ComparativoMercado {
   mercadoId: number;
   mercadoNome: string;
@@ -80,7 +87,11 @@ export interface ComparativoMercado {
   mediaPorCompra: number;
 }
 
-export type ColorSchemePreference = 'light' | 'dark' | 'system';
+/**
+ * Preferência de tema. `sistema` acompanha o aparelho; as outras duas
+ * forçam o modo independentemente do sistema.
+ */
+export type PreferenciaTema = 'claro' | 'escuro' | 'sistema';
 
 /** Formato de arquivo usado pela exportação/importação de backup (JSON). */
 export interface ExportedItem {

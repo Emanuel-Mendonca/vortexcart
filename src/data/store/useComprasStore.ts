@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 import {
+  CHAVE_TEMA,
   addCatalogoItem,
   addMetodoPagamento,
   atualizarCompra,
@@ -8,7 +9,10 @@ import {
   excluirCompra as excluirCompraDb,
   getComparativoMercados,
   getGastoPorMes,
+  getGastoPorMetodoPagamento,
   getPrecoMedioPorItem,
+  gravarPreferencia,
+  lerPreferencia,
   listCatalogo,
   listMetodosPagamento,
   listComprasComItens,
@@ -21,11 +25,13 @@ import {
 } from '@/storage';
 import type {
   CatalogoItem,
+  PreferenciaTema,
   NovoItemCompra,
   MetodoPagamento,
   ComparativoMercado,
   CompraComItens,
   GastoPorMes,
+  GastoPorMetodoPagamento,
   NovaCompraInput,
   PrecoMedioItem
 } from '@/types';
@@ -40,6 +46,7 @@ interface ComprasState {
   mercadosSugeridos: string[];
   mesesDisponiveis: string[];
   gastoPorMes: GastoPorMes[];
+  gastoPorMetodo: GastoPorMetodoPagamento[];
   comparativoMercados: ComparativoMercado[];
   editingId: number | null;
   /**
@@ -48,6 +55,8 @@ interface ComprasState {
    * itens pode ser longa demais para trafegar numa URL.
    */
   rascunhoCupom: RascunhoCupom | null;
+  /** Tema escolhido pelo usuário. `sistema` acompanha o aparelho. */
+  preferenciaTema: PreferenciaTema;
   filtroMes: string | null;
   filtroMercado: string | null;
 
@@ -57,6 +66,7 @@ interface ComprasState {
   excluirCompra: (id: number) => Promise<void>;
   iniciarEdicao: (id: number) => void;
   definirRascunhoCupom: (rascunho: RascunhoCupom | null) => void;
+  definirPreferenciaTema: (preferencia: PreferenciaTema) => Promise<void>;
   cancelarEdicao: () => void;
   setFiltroMes: (mes: string | null) => void;
   setFiltroMercado: (mercado: string | null) => void;
@@ -68,6 +78,11 @@ interface ComprasState {
   removerMetodoPagamento: (id: number) => Promise<void>;
   renomearItemCatalogo: (id: number, novoNome: string, categoria?: string) => Promise<void>;
   removerItemCatalogo: (id: number) => Promise<void>;
+}
+
+/** Protege contra valor inválido vindo do banco (edição manual, versão antiga). */
+function ehPreferenciaTema(valor: string | null): valor is PreferenciaTema {
+  return valor === 'claro' || valor === 'escuro' || valor === 'sistema';
 }
 
 export interface RascunhoCupom {
@@ -88,9 +103,11 @@ export const useComprasStore = create<ComprasState>((set, get) => ({
   mercadosSugeridos: [],
   mesesDisponiveis: [],
   gastoPorMes: [],
+  gastoPorMetodo: [],
   comparativoMercados: [],
   editingId: null,
   rascunhoCupom: null,
+  preferenciaTema: 'sistema',
   filtroMes: null,
   filtroMercado: null,
 
@@ -107,9 +124,10 @@ export const useComprasStore = create<ComprasState>((set, get) => ({
       // nome de um mercado (ou excluir a última compra de um mês) pode deixar
       // o filtro ativo apontando para algo que não existe mais, e aí a lista
       // viria vazia sem explicação nenhuma para quem está olhando.
-      const [mercadosSugeridos, mesesDisponiveis] = await Promise.all([
+      const [mercadosSugeridos, mesesDisponiveis, temaSalvo] = await Promise.all([
         listMercadosNomes(),
-        listMesesComCompras()
+        listMesesComCompras(),
+        lerPreferencia(CHAVE_TEMA).catch(() => null)
       ]);
 
       const { filtroMes: mesAtual, filtroMercado: mercadoAtual } = get();
@@ -123,6 +141,7 @@ export const useComprasStore = create<ComprasState>((set, get) => ({
         metodosPagamento,
         precoMedioPorItem,
         gastoPorMes,
+        gastoPorMetodo,
         comparativoMercados
       ] = await Promise.all([
         listComprasComItens({ mes: filtroMes, mercadoNome: filtroMercado }),
@@ -130,6 +149,7 @@ export const useComprasStore = create<ComprasState>((set, get) => ({
         listMetodosPagamento(),
         getPrecoMedioPorItem(),
         getGastoPorMes(),
+        getGastoPorMetodoPagamento(),
         getComparativoMercados()
       ]);
       set({
@@ -140,9 +160,11 @@ export const useComprasStore = create<ComprasState>((set, get) => ({
         mercadosSugeridos,
         mesesDisponiveis,
         gastoPorMes,
+        gastoPorMetodo,
         comparativoMercados,
         filtroMes,
-        filtroMercado
+        filtroMercado,
+        preferenciaTema: ehPreferenciaTema(temaSalvo) ? temaSalvo : 'sistema'
       });
     } finally {
       set({ carregando: false });
@@ -167,6 +189,13 @@ export const useComprasStore = create<ComprasState>((set, get) => ({
 
   iniciarEdicao: (id: number) => set({ editingId: id }),
   definirRascunhoCupom: (rascunho: RascunhoCupom | null) => set({ rascunhoCupom: rascunho }),
+
+  definirPreferenciaTema: async (preferencia: PreferenciaTema) => {
+    // Aplica na hora e grava depois: a troca de tema precisa ser instantânea,
+    // e uma falha de escrita só faz a escolha não sobreviver ao fechamento.
+    set({ preferenciaTema: preferencia });
+    await gravarPreferencia(CHAVE_TEMA, preferencia).catch(() => undefined);
+  },
   cancelarEdicao: () => set({ editingId: null }),
 
   setFiltroMes: (mes: string | null) => {

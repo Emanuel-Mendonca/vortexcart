@@ -9,6 +9,7 @@ import { getDb } from './db';
  */
 
 export const CHAVE_ONBOARDING = 'onboarding_concluido';
+export const CHAVE_TEMA = 'preferencia_tema';
 
 export async function lerPreferencia(chave: string): Promise<string | null> {
   const db = await getDb();

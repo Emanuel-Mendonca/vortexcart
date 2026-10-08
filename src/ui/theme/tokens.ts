@@ -38,22 +38,26 @@ export interface ColorPalette {
 }
 
 export const colorTokens: Record<'light' | 'dark', ColorPalette> = {
+  // Paleta "Kinetic Violet Modernist": superfícies claras e frias com tinta
+  // violeta-carvão, pontuadas por violeta elétrico. O dourado do tema escuro
+  // não sobrevive sobre fundo claro (contraste insuficiente), então o papel
+  // de destaque passa para a menta de precisão.
   light: {
-    background: palette.white,
-    surface: palette.white,
-    surfaceAlt: '#F3F0FA', // tonalidade clara da família lavanda
-    text: '#1E1341', // "on-primary-fixed", texto escuro com matiz roxo
-    textMuted: 'rgba(30,19,65,0.62)',
-    textFaint: 'rgba(30,19,65,0.4)',
-    border: '#7A7290',
-    borderMuted: 'rgba(74,64,111,0.18)',
-    primary: palette.lavenderDeep, // "inverse-primary" do M3
-    primaryPressed: '#4A406F', // "on-primary-fixed-variant"
-    onPrimary: palette.white,
-    accent: palette.gold, // "tertiary"
-    onAccent: '#363100', // "on-tertiary"
+    background: '#FBF8FF', // canvas
+    surface: '#FFFFFF', // cards e contêineres
+    surfaceAlt: '#F4F2FF', // superfície sutilmente elevada
+    text: '#191B28', // tinta principal
+    textMuted: '#474554',
+    textFaint: 'rgba(71,69,84,0.55)',
+    border: '#C8C4D7',
+    borderMuted: 'rgba(200,196,215,0.6)',
+    primary: '#4934C2', // violeta operacional
+    primaryPressed: '#4129BA',
+    onPrimary: '#FFFFFF',
+    accent: '#005A48', // menta de precisão, legível sobre claro
+    onAccent: '#FFFFFF',
     danger: '#BA1A1A',
-    overlay: 'rgba(16,19,27,0.6)'
+    overlay: 'rgba(25,27,40,0.45)'
   },
   dark: {
     background: palette.night, // "background" / "surface"

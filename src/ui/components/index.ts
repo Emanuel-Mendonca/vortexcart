@@ -13,3 +13,4 @@ export * from './Screen';
 export * from './SeletorCategoria';
 export * from './Onboarding';
 export * from './TelaAbertura';
+export * from './SeletorTema';
