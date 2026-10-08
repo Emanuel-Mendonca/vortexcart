@@ -123,22 +123,14 @@ ninguém. É por isso que quase toda a cobertura de testes vive em `shared/`.
 
 ## Documentação
 
-| Documento                                       | Conteúdo                                    |
-| ----------------------------------------------- | ------------------------------------------- |
-| [ARCHITECTURE.md](docs/projeto/ARCHITECTURE.md) | Camadas, fluxo de dados e decisões técnicas |
-| [ROADMAP.md](docs/projeto/ROADMAP.md)           | O que já foi entregue e o que vem a seguir  |
-| [BRANDING.md](docs/projeto/BRANDING.md)         | Nome, símbolo, paleta e variações do logo   |
-| [GUIA.md](docs/projeto/GUIA.md)                 | Rodar, gerar APK e publicar                 |
-| [CONTRIBUTING.md](.github/CONTRIBUTING.md)      | Fluxo, convenções de código e testes        |
-| [CHANGELOG.md](CHANGELOG.md)                    | Histórico de mudanças                       |
-
-## Contribuindo
-
-Contribuições são bem-vindas. Leia o [CONTRIBUTING.md](.github/CONTRIBUTING.md) e o
-[CODE_OF_CONDUCT.md](.github/CODE_OF_CONDUCT.md) antes de começar.
-
-Para reportar uma vulnerabilidade, siga o [SECURITY.md](.github/SECURITY.md), não abra
-issue pública.
+| Documento                                       | Conteúdo                                         |
+| ----------------------------------------------- | ------------------------------------------------ |
+| [ARCHITECTURE.md](docs/projeto/ARCHITECTURE.md) | Camadas, fluxo de dados e decisões técnicas      |
+| [ROADMAP.md](docs/projeto/ROADMAP.md)           | O que já foi entregue e o que vem a seguir       |
+| [BRANDING.md](docs/projeto/BRANDING.md)         | Nome, símbolo, paleta e variações do logo        |
+| [GUIA.md](docs/projeto/GUIA.md)                 | Rodar, gerar APK e publicar                      |
+| [CONVENCOES.md](docs/projeto/CONVENCOES.md)     | Fluxo de trabalho, convenções de código e testes |
+| [CHANGELOG.md](CHANGELOG.md)                    | Histórico de mudanças                            |
 
 ## Licença
 

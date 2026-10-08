@@ -91,4 +91,4 @@ Funções e tipos que representam o **domínio do app** (compras, mercados, iten
 português (`criarCompra`, `ComparativoMercado`) porque são conceitos específicos deste
 produto. Componentes e utilitários **genéricos**, que poderiam existir em qualquer app
 (`Button`, `TextField`, `formatBRL`), seguem convenção em inglês, como é comum no ecossistema
-React/React Native. Veja mais em [CONTRIBUTING.md](../../.github/CONTRIBUTING.md).
+React/React Native. Veja mais em [CONVENCOES.md](./CONVENCOES.md).

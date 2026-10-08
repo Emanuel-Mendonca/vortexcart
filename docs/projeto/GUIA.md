@@ -1,7 +1,6 @@
 # Guia de desenvolvimento e publicação
 
-Como rodar o projeto, gerar um app instalável e publicar. Para convenções de código,
-commits e Pull Request, veja [CONTRIBUTING.md](../../.github/CONTRIBUTING.md).
+Como rodar o projeto, gerar um app instalável e publicar. Para convenções de código e commits, veja [CONVENCOES.md](./CONVENCOES.md).
 
 ## Pré-requisitos
 
