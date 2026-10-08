@@ -55,7 +55,7 @@ function labelStyle(theme: Theme) {
 }
 
 function PulsingDot({ color }: { color: string }) {
-  const scale = useRef(new Animated.Value(1)).current;
+  const [scale] = useState(() => new Animated.Value(1));
   useEffect(() => {
     const loop = Animated.loop(
       Animated.sequence([

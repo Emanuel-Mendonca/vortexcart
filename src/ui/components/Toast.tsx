@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, Text } from 'react-native';
 
 import { useTema } from '@/theme';
@@ -13,7 +13,7 @@ interface ToastProps {
 /** Feedback rápido e não-bloqueante (ex.: "exportação concluída"), some sozinho. */
 export function Toast({ message, onHide, icon = 'checkmark-circle' }: ToastProps) {
   const theme = useTema();
-  const opacity = useRef(new Animated.Value(0)).current;
+  const [opacity] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     if (!message) return;

@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Image, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
 
@@ -42,10 +42,10 @@ interface TelaAberturaProps {
 export function TelaAbertura({ etapa, versao }: TelaAberturaProps) {
   const theme = useTema();
 
-  const giro = useRef(new Animated.Value(0)).current;
-  const giroInverso = useRef(new Animated.Value(0)).current;
-  const pulso = useRef(new Animated.Value(0)).current;
-  const progresso = useRef(new Animated.Value(0)).current;
+  const [giro] = useState(() => new Animated.Value(0));
+  const [giroInverso] = useState(() => new Animated.Value(0));
+  const [pulso] = useState(() => new Animated.Value(0));
+  const [progresso] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     const loop = (valor: Animated.Value, duracao: number) =>

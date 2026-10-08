@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 
@@ -21,8 +21,8 @@ import { useTema } from '@/theme';
 export function PassoDados() {
   const theme = useTema();
 
-  const giro = useRef(new Animated.Value(0)).current;
-  const pulso = useRef(new Animated.Value(0)).current;
+  const [giro] = useState(() => new Animated.Value(0));
+  const [pulso] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     const anel = Animated.loop(

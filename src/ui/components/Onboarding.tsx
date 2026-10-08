@@ -161,8 +161,8 @@ export function Onboarding({ visible, onConcluir }: OnboardingProps) {
   const theme = useTema();
   const [indice, setIndice] = useState(0);
 
-  const giro = useRef(new Animated.Value(0)).current;
-  const pulso = useRef(new Animated.Value(0)).current;
+  const [giro] = useState(() => new Animated.Value(0));
+  const [pulso] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     const anel = Animated.loop(
